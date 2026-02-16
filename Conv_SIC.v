@@ -7,6 +7,7 @@
 //   - Accumulates KxK contributions using an adder tree
 //   - Outputs a partial sum for this channel
 //=====================================================
+//
 module Conv_SIC_KAN #(
     parameter KERNEL_SIZE = 3,   // Convolution window size (KxK)
     parameter DATA_WIDTH  = 8,   // Input pixel width
