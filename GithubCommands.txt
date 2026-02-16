@@ -1,9 +1,6 @@
 git pull origin main
-git checkout shreyas
+git checkout main
 
 git add .
 git commit -m "d"
-git push origin shreyas
-git checkout main
-git pull origin main
-git merge shreyas 
+git push origin main
