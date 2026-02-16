@@ -127,5 +127,3 @@ A matching 2-stage valid shift register (`vpipe`) tracks the pipeline delay.
 ---
 
 ## License
-
-*No license specified yet.*

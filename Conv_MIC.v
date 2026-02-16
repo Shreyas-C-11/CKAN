@@ -66,6 +66,7 @@ module Conv_MIC_KAN #(
             );
         end
     endgenerate
+    //
 
     //=====================================================
     // Cross-channel accumulation

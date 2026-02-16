@@ -14,6 +14,7 @@
 //          ↓
 //       Flatten → flat_out + flat_valid
 //=====================================================
+//
 module CKAN_Model #(
     // ---------------- Image Parameters ----------------
     parameter IMG_WIDTH        = 5,
