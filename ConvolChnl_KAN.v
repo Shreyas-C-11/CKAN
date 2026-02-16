@@ -7,6 +7,7 @@
 //   - All output channels operate in parallel on the
 //     same KxKxCin kernel window
 //=====================================================
+//
 module ConvolChnl_KAN #(
     parameter KERNEL_SIZE     = 3,   // Convolution window size (KxK)
     parameter INPUT_CHANNELS  = 3,   // Number of input feature channels (Cin)

@@ -10,6 +10,7 @@
 //          ↓
 //       ConvolChnl_KAN   - CKAN feature extraction
 //=====================================================
+//
 module Conv2D_KAN #(
     // ---------------- Image Buffer Parameters ----------------
     parameter KERNEL_SIZE     = 3,   // Convolution window size (KxK)
