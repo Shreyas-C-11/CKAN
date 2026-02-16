@@ -8,6 +8,7 @@
 //       Layer 2: 13×13×2 → Conv 3×3 → 11×11×2 → Pool 2×2 →  5×5×2
 //       Flatten: 5×5×2×16b = 800-bit output vector
 //=====================================================
+//
 module CKAN_Model_DUT (
     input  wire        clock,
     input  wire        sreset_n,
