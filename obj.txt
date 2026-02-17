@@ -1,0 +1,128 @@
+Our Objective:
+
+Inside the src folder their is implementation of kan mlp (Kanele) and we have written implementation of ckan using verilog and after flattening it we will pass it to kanele mlp(IP) in src for implementing this : 
+1. we need to build a python version of ckan and train it on mnist and import kanele to use their python implementation of kan with it to build a final model in python 
+2. we need to export all the b-spline function in .mem file for our ckan and build ip for ckan and ip for mlp of kanele . 
+
+train_quant.py (code to train normal kan using kanele )
+
+convert.py (for converting kan mlp to ip)
+
+we can use some components of the kanele lib to build out ckan in python 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+============================================================================================================================================================================================================================
+
+how to use .mem file : 
+
+    n hardware, there are no B-splines. Instead, each learned function is pre-evaluated at every possible input value and stored as a lookup table (ROM). At runtime, the pixel value directly addresses the ROM.
+
+    Training (Python):     pixel → B-spline math → output
+                        (continuous, differentiable)
+    Hardware (Verilog):    pixel → ROM[pixel] → output
+                        (just a table lookup, zero math)
+    Step-by-step: How 
+    export_ckan_conv()
+    works
+    Step 1: Enumerate all possible inputs
+    With 4-bit quantized inputs, there are only 16 possible values a pixel can be. We get them from the quantizer:
+
+    python
+    # Get all 16 quantized input values: e.g. [-1.0, -0.875, ..., 0.875, 1.0]
+    input_state_space = self.model.input_layer.get_state_space()
+    # → tensor of 16 float values
+    Step 2: For each edge, evaluate the learned function at all 16 inputs
+    Each edge in the CKAN has its own spline function. For Conv layer with K=3, Cin=1, Cout=4, that's 4 × 1 × 9 = 36 functions.
+
+    python
+    for func_id in range(36):  # 36 edges total
+        out_ch = func_id // 9   # which output channel (0-3)
+        in_idx = func_id % 9    # which pixel in 3×3 window (0-8)
+        
+        # Evaluate THIS edge's learned function at all 16 input values:
+        #   base component:  SiLU(x) × base_weight[out_ch, in_idx]
+        #   spline component: B_spline(x) · spline_weight[out_ch, in_idx, :]
+        #   pruning mask:     × spline_selector[out_ch, in_idx]
+        
+        base_out   = SiLU(all_16_inputs) × base_weight[out_ch, in_idx]
+        spline_out = B_spline(all_16_inputs) · spline_weight[out_ch, in_idx]
+        combined   = spline_selector[out_ch, in_idx] × (base_out + spline_out)
+        
+        # → combined is a tensor of 16 float values (one per input)
+    Step 3: Quantize to integer
+    The hardware ROM stores integers, not floats:
+
+    python
+    # scale factor comes from the output quantizer (learned during QAT)
+        scale = output_quantizer.get_scale_factor()
+        
+        # float → integer
+        lut_values = round(combined / scale)
+        # clamp to signed range for 6-bit: [-32, 31]
+        lut_values = clamp(lut_values, -32, 31)
+        
+        # → [3, -1, 0, 2, 5, 8, 12, 15, 17, 18, 17, 15, 12, 8, 5, 2]
+        #    (example: a learned spline that looks like a bell curve)
+    Step 4: Write as hex to 
+    .mem
+    file
+    python
+    for v in lut_values:
+            # two's complement hex: -1 → "3F" (6-bit), 15 → "0F"
+            mem_lines.append(int_to_hex(v, bits=6))
+    The final 
+    .mem
+    file layout
+    All functions are concatenated, matching the Verilog ROM addressing:
+
+    kan_lut_conv0.mem:
+    ─────────────────
+    03  ← func 0 (out_ch=0, pos=0), input 0
+    3F  ← func 0, input 1
+    00  ← func 0, input 2
+    ...
+    02  ← func 0, input 15       ← end of function 0 (16 entries)
+    05  ← func 1 (out_ch=0, pos=1), input 0
+    08  ← func 1, input 1
+    ...                           ← 16 entries per function
+    ...
+    1F  ← func 35 (out_ch=3, pos=8), input 15  ← last entry
+    Total: 36 functions × 16 entries = 576 lines
+
+    How Verilog reads it
+
+    // KAN_LUT_ROM.v
+    // Address = {function_id, input_value}
+    //         = {5-bit func_id, 4-bit pixel} = 9-bit address
+    reg [VALUE_WIDTH-1:0] rom [0 : NUM_FUNCTIONS * 2**DATA_WIDTH - 1];
+    initial $readmemh("kan_lut_conv0.mem", rom);
+    // At runtime: pixel 0x7 from function 12
+    // → rom[12 * 16 + 7] → reads the pre-computed spline value
+    assign data_out = rom[{function_id, input_value}];
+
+    The MLP export (export_mlp)
+
+    Same principle but writes one .mem file per connection (matching Kanele's KAN_LUT_MNIST convention):
+
+    mlp_lut_0_5_2.mem    ← MLP layer 0, input neuron 5, output neuron 2
+    mlp_lut_0_5_3.mem    ← MLP layer 0, input neuron 5, output neuron 3
+    ...
+    (pruned connections are skipped — no file generated)
+
+    ============================================================================================================================================================================================================================
+
+    summary of the whole process :
+
+    1. Train CKAN in Python (train_ckan.py)
+    2. Export B-spline tables to .mem files (export_ckan_conv)
+    3. Generate Verilog IPs for CKAN layers (KAN_LUT_ROM.v)
+    4. Export MLP tables to .mem files (export_mlp)
+    5. Generate Verilog IPs for MLP layers (KAN_LUT_MNIST.v)
+    6. Stitch everything together in a top-level Verilog module
+    7. Synthesize and verify in Vivado
+
+        Trained model                    .mem files                 Verilog hardware
+    ─────────────                    ──────────                 ────────────────
+    spline_weight  ─┐
+    base_weight     ├→ evaluate at   → hex values per line  → $readmemh into ROM
+    spline_selector ┘  all quantized                           pixel → ROM[pixel]
+                    input values                            (zero math at runtime)
