@@ -140,65 +140,88 @@ class CKANExport:
 
         return meta
 
-    def export_mlp(self, output_dir):
+    def export_mlp_firmware(self, clock_period=1.2, n_add=4, fpga_part="xcvu9p-flgb2104-2-i", latency=8):
         """
-        Export the KAN MLP layers to truth-table .mem files
-        (one per connection), similar to KAN_LUT_MNIST.
-
+        Export the complete MLP firmware using Kanele's KAN_LUT infrastructure.
+        
+        This generates:
+        - VHDL source files (KAN.vhd, PkgKAN.vhd, PkgLUT.vhd, LUT_*.vhd)
+        - .mem files for LUT initialization
+        - Vivado build scripts (.tcl)
+        - Simulation testbenches (optional)
+        
+        Uses KAN_LUT.generate_firmware() which handles everything automatically.
+        
         Args:
-            output_dir: directory to write mem files into
+            clock_period: target clock period in ns (for timing constraints)
+            n_add: adder tree configuration
+            fpga_part: target FPGA part number
+            latency: pipeline latency for simulation
         """
-        os.makedirs(output_dir, exist_ok=True)
-
-        mlp_layers = self.model.mlp_layers
-        written = 0
-
-        for i, layer in enumerate(mlp_layers):
-            in_f = layer.in_features
-            out_f = layer.out_features
-
-            # Determine input state space
-            if i == 0:
-                # First MLP layer input comes from the last conv layer's output
-                last_conv = self.model.conv_layers[-1]
-                input_state_space = last_conv.kan.output_quantizer.get_state_space(
-                    self.is_cuda
-                )
+        from KAN_LUT import KAN_LUT
+        
+        print("[CKAN Export] Generating MLP firmware using Kanele's KAN_LUT...")
+        
+        # Build config for KAN_LUT (MLP-only portion)
+        mlp_config = {
+            "layers": self.config["mlp_layers"],
+            "layers_bitwidth": self.config["mlp_bitwidth"],
+            "grid_size": self.config["grid_size"],
+            "spline_order": self.config["spline_order"],
+            "grid_eps": self.config["grid_eps"],
+            "grid_range": self.config["grid_range"],
+            "base_activation": self.config["base_activation"],
+        }
+        
+        # Create checkpoint with MLP state
+        mlp_checkpoint = {"model_state_dict": {}}
+        for i, mlp_layer in enumerate(self.model.mlp_layers):
+            for key, value in mlp_layer.state_dict().items():
+                mlp_checkpoint["model_state_dict"][f"layers.{i}.{key}"] = value
+        
+        # Rebuild the input layer for MLP
+        # (first MLP layer input comes from the flattened conv output)
+        last_conv = self.model.conv_layers[-1]
+        mlp_input_quantizer = last_conv.kan.output_quantizer
+        
+        # Create temporary directory for KAN_LUT (it expects a model_dir structure)
+        import tempfile
+        import shutil
+        
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            # KAN_LUT writes to tmp_dir/firmware/
+            kan_lut = KAN_LUT(
+                model_dir=tmp_dir,
+                checkpoint=mlp_checkpoint,
+                config=mlp_config,
+                input_layer=mlp_input_quantizer,
+                device=self.device
+            )
+            
+            # Generate complete firmware (VHDL + .mem + TCL + optional sim)
+            kan_lut.generate_firmware(
+                clock_period=clock_period,
+                n_add=n_add,
+                fpga_part=fpga_part,
+                latency=latency
+            )
+            
+            # Copy generated firmware to our output location
+            src_firmware = os.path.join(tmp_dir, "firmware")
+            dst_firmware = os.path.join(os.path.dirname(self.model.conv_layers[0].kan.state_dict().__repr__()), "..", "mlp_firmware")
+            
+            # Better: use a fixed output path
+            if hasattr(self, 'output_dir'):
+                dst_firmware = os.path.join(self.output_dir, "mlp_firmware")
+            
+            if os.path.exists(src_firmware):
+                shutil.copytree(src_firmware, dst_firmware, dirs_exist_ok=True)
+                print(f"[CKAN Export] ✓ MLP firmware copied to {dst_firmware}")
+                print(f"[CKAN Export]   Contains: VHDL sources, .mem files, Vivado scripts")
             else:
-                input_state_space = mlp_layers[i - 1].output_quantizer.get_state_space(
-                    self.is_cuda
-                )
-
-            input_state_space = input_state_space.to(self.device)
-            scale, bits = layer.output_quantizer.get_scale_factor_bits(self.is_cuda)
-            bin_ss = layer.output_quantizer.get_bin_state_space(self.is_cuda).to(self.device)
-            min_s, max_s = int(bin_ss.min()), int(bin_ss.max())
-
-            x = input_state_space.unsqueeze(0).repeat(in_f, 1).T.to(self.device)
-            spline_bases = layer.b_splines(x)
-
-            for j in range(in_f):
-                for k in range(out_f):
-                    if layer.spline_selector[k, j].item() == 0:
-                        continue  # pruned
-
-                    base_out = layer.base_activation(x)[:, j] * layer.base_weight[k, j]
-                    spline_out = F.linear(
-                        spline_bases[:, j, :],
-                        layer.scaled_spline_weight[k, j, :],
-                    )
-                    combined = layer.spline_selector[k, j] * (base_out + spline_out)
-                    vals = (combined / scale).round().to(torch.int).tolist()
-                    vals = np.clip(vals, min_s, max_s).tolist()
-
-                    mem_path = os.path.join(output_dir, f"mlp_lut_{i}_{j}_{k}.mem")
-                    with open(mem_path, "w") as f:
-                        f.write("\n".join(
-                            self._int_to_hex(v, layer.out_precision) for v in vals
-                        ))
-                    written += 1
-
-        print(f"[CKAN Export] Wrote {written} MLP LUT .mem file(s) to {output_dir}")
+                print(f"[CKAN Export] ⚠ Warning: firmware directory not found")
+        
+        return dst_firmware
 
     # ------------------------------------------------------------------
     # Helpers

@@ -70,21 +70,29 @@ if 'val_accuracy' in checkpoint:
 # ─── Export ───────────────────────────────────────────────────────────
 firmware_dir = os.path.join(model_dir, 'firmware')
 exporter = CKANExport(model, config, device)
+exporter.output_dir = firmware_dir  # Set output directory for MLP firmware
 
 with torch.inference_mode():
-    # 1. Export CKAN conv layer(s) → single .mem per layer
+    # 1. Export CKAN conv layer(s) → single .mem per layer + metadata
     for i in range(len(model.conv_layers)):
         exporter.export_ckan_conv(
             output_dir=os.path.join(firmware_dir, 'mem'),
             conv_layer_idx=i,
         )
 
-    # 2. Export MLP layers → per-connection .mem files
-    exporter.export_mlp(
-        output_dir=os.path.join(firmware_dir, 'mem'),
+    # 2. Export MLP layers → complete VHDL firmware (VHDL + .mem + TCL)
+    mlp_fw_dir = exporter.export_mlp_firmware(
+        clock_period=1.2,      # 833 MHz target
+        n_add=4,               # adder tree config
+        fpga_part="xcvu9p-flgb2104-2-i",  # VU9P FPGA
+        latency=8              # pipeline depth
     )
 
-print(f"\n✓ All firmware files written to: {firmware_dir}/")
-print(f"  • Copy kan_lut_conv*.mem into your Verilog Conv2D_KAN project")
-print(f"  • Copy mlp_lut_*.mem into your Kanele VHDL MLP project")
-print(f"  • See conv*_meta.json for Verilog module parameters")
+print(f"\n✓ All firmware files generated:")
+print(f"  CKAN Conv: {firmware_dir}/mem/  → kan_lut_conv*.mem + conv*_meta.json")
+print(f"  MLP VHDL:  {mlp_fw_dir}/        → complete Kanele IP (VHDL+mem+TCL)")
+print(f"\nNext steps:")
+print(f"  1. Use generate_verilog.py to create CKAN_Model_Custom.v")
+print(f"  2. Wire CKAN_Model_Custom.flat_out → MLP KAN.vhd input")
+print(f"  3. Synthesize with Vivado")
+

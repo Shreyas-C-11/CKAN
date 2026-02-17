@@ -72,37 +72,42 @@ logging.getLogger().addHandler(console)
 #   CKAN conv layers  = spatial compressor (4-bit color in → small feature map)
 #   Kanele KAN MLP    = classifier (small flat vector → class logits)
 #
-# The conv layers progressively reduce spatial dimensions until the
-# flattened output is compact enough for Kanele to classify efficiently.
+# Architecture matches Verilog CKAN_Model.v:
+#   - Stride-1 convolutions for feature extraction
+#   - 2×2 max pooling for spatial downsampling
+#   - This differs from pure stride-2 conv; pooling preserves more features
 #
 # ─── MNIST (1ch grayscale) ───
-#   1×28×28 →[4-bit]→ CKANConv 1→4 K=3 S=2 → 13×13×4
-#                    → CKANConv 4→8 K=3 S=2 →  6×6×8
-#                    → Flatten(288) → Kanele MLP 288→32→10
+#   1×28×28 →[8-bit]→ CKANConv 1→2 K=3 S=1 → 26×26×2 → Pool 2×2 → 13×13×2
+#                    → CKANConv 2→2 K=3 S=1 → 11×11×2 → Pool 2×2 →  5×5×2
+#                    → Flatten(50) → Kanele MLP 50→32→10
 #
 # ─── CIFAR-10 (3ch color) — uncomment to use ───
-#   3×32×32 →[4-bit]→ CKANConv 3→8  K=3 S=1 → 30×30×8
-#                    → CKANConv 8→16 K=3 S=2 → 14×14×16
-#                    → CKANConv 16→16 K=3 S=2 →  6×6×16
+#   3×32×32 →[8-bit]→ CKANConv 3→8  K=3 S=1 → 30×30×8  → Pool 2×2 → 15×15×8
+#                    → CKANConv 8→16 K=3 S=1 → 13×13×16 → Pool 2×2 →  6×6×16
 #                    → Flatten(576) → Kanele MLP 576→64→10
 #
 
-# ── MNIST config ──
+# ── MNIST config (matches Verilog CKAN_Model_DUT.v) ──
 config = {
     "image_height": 28,
     "image_width": 28,
 
-    # CKAN conv: compress 1×28×28 down to 8×6×6
+    # CKAN conv: stride-1 convolutions with 2×2 pooling
     "conv_layers": [
-        {"in_channels": 1, "out_channels": 4, "kernel_size": 3, "stride": 2,
-         "in_precision": 4, "out_precision": 6},       # 1×28×28 → 4×13×13
-        {"in_channels": 4, "out_channels": 8, "kernel_size": 3, "stride": 2,
-         "in_precision": 6, "out_precision": 6},        # 4×13×13 → 8×6×6
+        {"in_channels": 1, "out_channels": 2, "kernel_size": 3, "stride": 1,
+         "in_precision": 8, "out_precision": 8},     # 1×28×28 → 2×26×26 → pool → 2×13×13
+        {"in_channels": 2, "out_channels": 2, "kernel_size": 3, "stride": 1,
+         "in_precision": 16, "out_precision": 16},   # 2×13×13 → 2×11×11 → pool → 2×5×5
     ],
 
+    # Pooling (applied after each conv layer)
+    "pool_size": 2,
+    "pool_stride": 2,
+
     # Kanele MLP: classify the compressed features
-    "mlp_layers": [288, 32, 10],    # 8×6×6 = 288 → 32 → 10 classes
-    "mlp_bitwidth": [6, 6, 6],
+    "mlp_layers": [50, 32, 10],     # 2×5×5 = 50 → 32 → 10 classes
+    "mlp_bitwidth": [16, 16, 16],
 
     # shared KAN hyper-params
     "grid_size": 15,
@@ -215,8 +220,8 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.1307,), (0.3081,)),
 ])
-trainset = torchvision.datasets.MNIST(root='./data', train=True,  download=True, transform=transform)
-valset   = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+trainset = torchvision.datasets.MNIST(root='./data', train=True,  download=False, transform=transform)
+valset   = torchvision.datasets.MNIST(root='./data', train=False, download=False, transform=transform)
 trainloader = DataLoader(trainset, batch_size=config['batch_size'], shuffle=True)
 valloader   = DataLoader(valset,   batch_size=config['batch_size'], shuffle=False)
 
