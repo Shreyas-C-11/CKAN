@@ -19,7 +19,6 @@ Each function block has 2^DATA_WIDTH entries (one per quantized input value).
 import os
 import json
 import torch
-import torch.nn.functional as F
 import numpy as np
 from math import ceil, log2
 
@@ -98,7 +97,7 @@ class CKANExport:
 
             # Evaluate the learned function for this edge
             base_out = kan.base_activation(x)[:, in_idx] * kan.base_weight[out_ch, in_idx]
-            spline_out = F.linear(
+            spline_out = torch.matmul(
                 spline_bases[:, in_idx, :],
                 kan.scaled_spline_weight[out_ch, in_idx, :],
             )
@@ -208,11 +207,12 @@ class CKANExport:
             
             # Copy generated firmware to our output location
             src_firmware = os.path.join(tmp_dir, "firmware")
-            dst_firmware = os.path.join(os.path.dirname(self.model.conv_layers[0].kan.state_dict().__repr__()), "..", "mlp_firmware")
             
-            # Better: use a fixed output path
-            if hasattr(self, 'output_dir'):
+            # Use configured output path, or a sensible default
+            if hasattr(self, 'output_dir') and self.output_dir:
                 dst_firmware = os.path.join(self.output_dir, "mlp_firmware")
+            else:
+                dst_firmware = os.path.join('.', 'firmware', 'mlp_firmware')
             
             if os.path.exists(src_firmware):
                 shutil.copytree(src_firmware, dst_firmware, dirs_exist_ok=True)
