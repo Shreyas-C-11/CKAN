@@ -312,9 +312,19 @@ class KANLinear(torch.nn.Module):
 
         # Apply backward pruning if next layer sparsity is provided
         if next_layer_sparsity_matrix is not None:
-            # Find columns that are all zeros (no connections to next layer)
-            zero_cols = (next_layer_sparsity_matrix == 0).all(dim=0)
-            self.spline_selector[zero_cols, :] = 0
+            # Find which input features of the next layer are fully dead
+            zero_cols = (next_layer_sparsity_matrix == 0).all(dim=0)  # [next_in_features]
+
+            next_in = zero_cols.shape[0]
+            if next_in == self.out_features:
+                # 1-to-1 mapping (MLP → MLP): direct indexing
+                self.spline_selector[zero_cols, :] = 0
+            elif next_in > self.out_features and next_in % self.out_features == 0:
+                # Grouped mapping (Conv → Conv): K² input features per output channel
+                # Group columns and check if ALL features in a group are dead
+                group_size = next_in // self.out_features
+                zero_groups = zero_cols.reshape(self.out_features, group_size).all(dim=1)
+                self.spline_selector[zero_groups, :] = 0
 
 class KANQuant(torch.nn.Module):
     def __init__(self, config, input_layer, device):

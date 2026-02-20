@@ -91,7 +91,7 @@ def generate_ckan_model_verilog(config, output_path):
 // Description:
 //   Auto-generated from config.json
 //   {num_layers}-layer CKAN CNN model
-//   Generated for: {img_h}×{img_w} input
+//   Generated for: {img_h}\u00d7{img_w} input
 //=====================================================
 
 module CKAN_Model_Custom #(
@@ -99,24 +99,22 @@ module CKAN_Model_Custom #(
     parameter IMG_WIDTH        = {img_w},
     parameter IMG_HEIGHT       = {img_h},
 
-    // ---------------- Shared Conv Parameters ----------------
-    parameter KERNEL_SIZE      = {conv_layers[0]['kernel_size']},
-    parameter CONV_STRIDE      = {conv_layers[0].get('stride', 1)},
-
 """
     
-    # Layer-specific parameters
+    # Layer-specific parameters (kernel, stride, channels, bitwidths are all per-layer)
     for i, dims in enumerate(layer_dims):
         idx = i + 1
         verilog += f"""    // ---------------- Layer {idx} Parameters ----------------
-    parameter L{idx}_INPUT_CHANNELS  = {dims['in_channels']},
-    parameter L{idx}_OUTPUT_CHANNELS = {dims['out_channels']},
-    parameter L{idx}_DATA_WIDTH      = {dims['data_width']},
+    parameter L{idx}_KERNEL_SIZE      = {dims['kernel_size']},
+    parameter L{idx}_CONV_STRIDE      = {dims['stride']},
+    parameter L{idx}_INPUT_CHANNELS   = {dims['in_channels']},
+    parameter L{idx}_OUTPUT_CHANNELS  = {dims['out_channels']},
+    parameter L{idx}_DATA_WIDTH       = {dims['data_width']},
+    parameter L{idx}_VALUE_WIDTH      = {dims['value_width']},
 """
     
     verilog += f"""
-    // ---------------- Shared CKAN Parameters ----------------
-    parameter VALUE_WIDTH      = {conv_layers[0]['out_precision']},
+    // ---------------- Shared Parameters ----------------
     parameter OUT_WIDTH        = {out_width},
 
     // ---------------- Shared Pool Parameters ----------------
@@ -154,7 +152,7 @@ module CKAN_Model_Custom #(
     for i in range(num_layers):
         idx = i + 1
         verilog += f""",
-    output wire [L{idx}_OUTPUT_CHANNELS*OUT_WIDTH-1:0]  l{idx}_pool_out,
+    output wire [L{idx}_OUTPUT_CHANNELS*L{idx}_VALUE_WIDTH-1:0]  l{idx}_pool_out,
     output wire                                     l{idx}_pool_valid"""
     
     verilog += """
@@ -168,7 +166,7 @@ module CKAN_Model_Custom #(
     # Generate internal signal declarations
     for i in range(num_layers):
         idx = i + 1
-        verilog += f"""    wire [L{idx}_OUTPUT_CHANNELS*OUT_WIDTH-1:0] l{idx}_conv_out;
+        verilog += f"""    wire [L{idx}_OUTPUT_CHANNELS*L{idx}_VALUE_WIDTH-1:0] l{idx}_conv_out;
     wire                                    l{idx}_conv_valid;
 """
     
@@ -194,14 +192,14 @@ module CKAN_Model_Custom #(
     // Layer {idx}: CKAN Conv + Pool
     //=====================================================
     CKAN_Layer #(
-        .KERNEL_SIZE     (KERNEL_SIZE),
+        .KERNEL_SIZE     (L{idx}_KERNEL_SIZE),
         .IMG_WIDTH       ({in_w}),
         .IMG_HEIGHT      ({in_h}),
-        .CONV_STRIDE     (CONV_STRIDE),
+        .CONV_STRIDE     (L{idx}_CONV_STRIDE),
         .INPUT_CHANNELS  (L{idx}_INPUT_CHANNELS),
         .OUTPUT_CHANNELS (L{idx}_OUTPUT_CHANNELS),
         .DATA_WIDTH      (L{idx}_DATA_WIDTH),
-        .VALUE_WIDTH     (VALUE_WIDTH),
+        .VALUE_WIDTH     (L{idx}_VALUE_WIDTH),
         .OUT_WIDTH       (OUT_WIDTH),
         .POOL_SIZE       (POOL_SIZE),
         .POOL_STRIDE     (POOL_STRIDE),
@@ -226,7 +224,7 @@ module CKAN_Model_Custom #(
     //=====================================================
     Flatten #(
         .CHANNELS   (L{last_idx}_OUTPUT_CHANNELS),
-        .DATA_WIDTH (OUT_WIDTH),
+        .DATA_WIDTH (L{last_idx}_VALUE_WIDTH),
         .COLUMN_NUM (L{last_idx}_POOL_OUT_W),
         .ROW_NUM    (L{last_idx}_POOL_OUT_H)
     ) flatten_inst (

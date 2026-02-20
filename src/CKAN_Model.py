@@ -52,6 +52,11 @@ class CKANModel(nn.Module):
             device=device,
         )
 
+        # ── Pooling ──
+        pool_size = config.get("pool_size", 2)
+        pool_stride = config.get("pool_stride", 2)
+        self.pool = nn.MaxPool2d(kernel_size=pool_size, stride=pool_stride)
+
         # ── CKAN convolution layers ──
         self.conv_layers = nn.ModuleList()
         for cfg in config["conv_layers"]:
@@ -103,9 +108,10 @@ class CKANModel(nn.Module):
         # Reshape to spatial: [B, Cin, H, W]
         x = x.reshape(-1, self.img_channels, self.img_h, self.img_w)
 
-        # CKAN conv layers
+        # CKAN conv layers (conv → pool, matching Verilog CKAN_Layer)
         for conv in self.conv_layers:
             x = conv(x)
+            x = self.pool(x)
 
         # Flatten
         x = x.flatten(1)
