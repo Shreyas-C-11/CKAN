@@ -2,26 +2,26 @@
 // Module: CKAN_Model_DUT
 // Description:
 //   - Design-Under-Test wrapper targeting MNIST
-//   - MNIST: 28×28 grayscale (1 channel, 8-bit pixels)
+//   - MNIST: 28×28 grayscale (1 channel, 4-bit pixels)
 //   - Architecture:
 //       Layer 1: 28×28×1 → Conv 3×3 → 26×26×2 → Pool 2×2 → 13×13×2
 //       Layer 2: 13×13×2 → Conv 3×3 → 11×11×2 → Pool 2×2 →  5×5×2
-//       Flatten: 5×5×2×16b = 800-bit output vector
+//       Flatten: 5×5×2×8b = 400-bit output vector
 //=====================================================
 //
 module CKAN_Model_DUT (
     input  wire        clock,
     input  wire        sreset_n,
     input  wire        data_valid,
-    input  wire [7:0]  pixel_in,       // 1 channel × 8 bits
+    input  wire [3:0]  pixel_in,       // 1 channel × 4 bits
 
-    output wire [799:0] flat_out,      // 5×5×2×16 = 800 bits
+    output wire [399:0] flat_out,      // 5×5×2×8 = 400 bits
     output wire         flat_valid,
 
     // Intermediate taps
-    output wire [31:0]  l1_pool_out,   // 2 channels × 16 bits
+    output wire [15:0]  l1_pool_out,   // 2 channels × 8 bits
     output wire         l1_pool_valid,
-    output wire [31:0]  l2_pool_out,   // 2 channels × 16 bits
+    output wire [15:0]  l2_pool_out,   // 2 channels × 8 bits
     output wire         l2_pool_valid
 );
 
@@ -37,14 +37,14 @@ module CKAN_Model_DUT (
         // Layer 1
         .L1_INPUT_CHANNELS   (1),
         .L1_OUTPUT_CHANNELS  (2),
-        .L1_DATA_WIDTH       (8),
+        .L1_DATA_WIDTH       (4),
 
         // Layer 2
         .L2_OUTPUT_CHANNELS  (2),
 
         // Shared CKAN
-        .VALUE_WIDTH         (8),
-        .OUT_WIDTH           (16),
+        .VALUE_WIDTH         (4),
+        .OUT_WIDTH           (8),
 
         // Shared pool
         .POOL_SIZE           (2),
