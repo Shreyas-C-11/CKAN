@@ -4,7 +4,7 @@
 # Define project name and paths
 set PROJ "KAN_FPGA_PROJECT"
 set DIR  [file normalize [pwd]]
-set SRCDIR [file normalize [file join $DIR ..]]
+set SRCDIR ".."
 set PART "xc7z020clg400-1"
 
 # Create in-memory project with the specified part
