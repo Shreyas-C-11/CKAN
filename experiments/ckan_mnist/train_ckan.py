@@ -98,7 +98,7 @@ config = {
         {"in_channels": 1, "out_channels": 2, "kernel_size": 3, "stride": 1,
          "in_precision": 4, "out_precision": 8},     # 1×28×28 → 2×26×26 → pool → 2×13×13
         {"in_channels": 2, "out_channels": 2, "kernel_size": 3, "stride": 1,
-         "in_precision": 4, "out_precision": 8},   # 2×13×13 → 2×11×11 → pool → 2×5×5
+         "in_precision": 8, "out_precision": 8},   # 2×13×13 → 2×11×11 → pool → 2×5×5
     ],
 
     # Pooling (applied after each conv layer)
