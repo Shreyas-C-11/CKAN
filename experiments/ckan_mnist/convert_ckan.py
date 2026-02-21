@@ -24,7 +24,16 @@ from brevitas.core.quant import QuantType
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # ─── Find best checkpoint ────────────────────────────────────────────
-model_dir = "models/"  # ← set to your model directory
+models_root = "models/"
+
+# Auto-discover latest run directory (e.g., models/20260220_150404/)
+subdirs = sorted([d for d in os.listdir(models_root)
+                  if os.path.isdir(os.path.join(models_root, d))])
+if subdirs:
+    model_dir = os.path.join(models_root, subdirs[-1])  # latest by name (timestamp)
+    print(f"Found run directory: {model_dir}")
+else:
+    model_dir = models_root  # fallback to models/ itself
 
 # Auto-pick best accuracy checkpoint
 files = [f for f in os.listdir(model_dir) if f.endswith('.pt')]

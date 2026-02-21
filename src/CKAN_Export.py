@@ -183,6 +183,11 @@ class CKANExport:
         last_conv = self.model.conv_layers[-1]
         mlp_input_quantizer = last_conv.kan.output_quantizer
         
+        # Include the input layer's state in the checkpoint
+        # (KANQuant stores self.input_layer, so load_state_dict expects its keys)
+        for key, value in mlp_input_quantizer.state_dict().items():
+            mlp_checkpoint["model_state_dict"][f"input_layer.{key}"] = value
+        
         # Create temporary directory for KAN_LUT (it expects a model_dir structure)
         import tempfile
         import shutil
@@ -197,13 +202,15 @@ class CKANExport:
                 device=self.device
             )
             
-            # Generate complete firmware (VHDL + .mem + TCL + optional sim)
+            # Generate complete firmware (VHDL + .mem + TCL)
             kan_lut.generate_firmware(
                 clock_period=clock_period,
                 n_add=n_add,
                 fpga_part=fpga_part,
-                latency=latency
             )
+            
+            # Generate simulation files (testbench + test vectors)
+            kan_lut.simulate_firmware(latency=latency)
             
             # Copy generated firmware to our output location
             src_firmware = os.path.join(tmp_dir, "firmware")
