@@ -1,6 +1,0 @@
-git pull origin main
-git checkout main
-
-git add .
-git commit -m "d"
-git push origin main
