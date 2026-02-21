@@ -4,7 +4,8 @@
 # Define project name and paths
 set PROJ "KAN_FPGA_PROJECT"
 set DIR  [file normalize [pwd]]
-set PART "xcvu9p-flgb2104-2-i"
+set SRCDIR [file normalize [file join $DIR ..]]
+set PART "xc7z020clg400-1"
 
 # Create in-memory project with the specified part
 create_project -name $PROJ -part $PART -force
@@ -14,15 +15,17 @@ set_property default_lib work [current_project]
 # Define output files
 file mkdir -p "$DIR/$PROJ"
 
-# Add VHDL sources
-add_files -norecurse [glob $DIR/src/*.vhd]
+# Add VHDL sources (foreach to handle spaces in path)
+foreach f [glob "$SRCDIR/src/*.vhd"] {
+    add_files -norecurse "$f"
+}
 
 # Add .mem files and mark for synthesis
-set mems [glob -nocomplain $DIR/mem/*.mem]
+set mems [glob -nocomplain "$SRCDIR/mem/*.mem"]
 if {[llength $mems] > 0} {
-    add_files -norecurse $mems
     foreach f $mems {
-        set_property used_in_synthesis true [get_files $f]
+        add_files -norecurse "$f"
+        set_property used_in_synthesis true [get_files "$f"]
     }
 }
 

@@ -1,0 +1,31 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Sat Feb 21 18:39:56 2026
+# Process ID: 13652
+# Current directory: C:/Users/admin/Desktop/SOP/VIVADO projects/Convo/divys/CKAN/experiments/ckan_mnist/models/20260220_150404/firmware/mlp_firmware/vivado
+# Command line: vivado.exe -mode batch -source build_full.tcl
+# Log file: C:/Users/admin/Desktop/SOP/VIVADO projects/Convo/divys/CKAN/experiments/ckan_mnist/models/20260220_150404/firmware/mlp_firmware/vivado/vivado.log
+# Journal file: C:/Users/admin/Desktop/SOP/VIVADO projects/Convo/divys/CKAN/experiments/ckan_mnist/models/20260220_150404/firmware/mlp_firmware/vivado\vivado.jou
+# Running On: DESKTOP-9696I54, OS: Windows, CPU Frequency: 1800 MHz, CPU Physical cores: 4, Host memory: 17072 MB
+#-----------------------------------------------------------
+source build_full.tcl
+# set PROJ "KAN_FPGA_PROJECT"
+# set DIR  [file normalize [pwd]]
+# set PART "xc7z020clg400-1"
+# create_project -name $PROJ -part $PART -force
+INFO: [ProjectBase 1-489] The host OS only allows 260 characters in a normal path. The project is stored in a path with more than 80 characters. If you experience issues with IP, Block Designs, or files not being found, please consider moving the project to a location with a shorter path. Alternately consider using the OS subst command to map part of the path to a drive letter.
+Current project path is 'C:/Users/admin/Desktop/SOP/VIVADO projects/Convo/divys/CKAN/experiments/ckan_mnist/models/20260220_150404/firmware/mlp_firmware/vivado'
+create_project: Time (s): cpu = 00:00:10 ; elapsed = 00:00:10 . Memory (MB): peak = 462.957 ; gain = 183.961
+# set_property target_language VHDL [current_project]
+# set_property default_lib work [current_project]
+# file mkdir -p "$DIR/$PROJ"
+no files matched glob pattern "C:/Users/admin/Desktop/SOP/VIVADO projects/Convo/divys/CKAN/experiments/ckan_mnist/models/20260220_150404/firmware/mlp_firmware/vivado/src/*.vhd"
+    while executing
+"glob $DIR/src/*.vhd"
+    invoked from within
+"add_files -norecurse [glob $DIR/src/*.vhd]"
+    (file "build_full.tcl" line 18)
+INFO: [Common 17-206] Exiting Vivado at Sat Feb 21 18:40:09 2026...
