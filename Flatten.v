@@ -35,10 +35,13 @@ module Flatten #(
     //=====================================================
     reg [COUNTER_BITS-1:0] pos_counter;
 
+    integer k;
     always @(posedge clock) begin
         if (!sreset_n) begin
             pos_counter <= 0;
             flat_valid  <= 1'b0;
+            for (k = 0; k < TOTAL_POSITIONS; k = k + 1)
+                buffer[k] <= {WORD_WIDTH{1'b0}};
         end
         else if (data_valid) begin
             buffer[pos_counter] <= data_in;
