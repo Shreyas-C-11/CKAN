@@ -1,0 +1,17 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Sat Feb 21 18:38:25 2026
+# Process ID: 9200
+# Current directory: C:/Users/admin/Desktop/SOP/VIVADO projects/Convo/divys/CKAN
+# Command line: vivado.exe -mode batch -source C:\Users\admin\Desktop\SOP\VIVADO projects\Convo\divys\CKAN\experiments\ckan_mnist\models\20260220_150404\firmware\mlp_firmware\vivado\build_full.tcl
+# Log file: C:/Users/admin/Desktop/SOP/VIVADO projects/Convo/divys/CKAN/vivado.log
+# Journal file: C:/Users/admin/Desktop/SOP/VIVADO projects/Convo/divys/CKAN\vivado.jou
+# Running On: DESKTOP-9696I54, OS: Windows, CPU Frequency: 1800 MHz, CPU Physical cores: 4, Host memory: 17072 MB
+#-----------------------------------------------------------
+source {C:\Users\admin\Desktop\SOP\VIVADO}
+source {projects\Convo\divys\CKAN\experiments\ckan_mnist\models\20260220_150404\firmware\mlp_firmware\vivado\build_full.tcl}
+couldn't read file "projects\Convo\divys\CKAN\experiments\ckan_mnist\models\20260220_150404\firmware\mlp_firmware\vivado\build_full.tcl": no such file or directory
+INFO: [Common 17-206] Exiting Vivado at Sat Feb 21 18:38:28 2026...
