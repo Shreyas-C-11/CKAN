@@ -93,7 +93,7 @@ with torch.inference_mode():
     mlp_fw_dir = exporter.export_mlp_firmware(
         clock_period=1.2,      # 833 MHz target
         n_add=4,               # adder tree config
-        fpga_part="xcvu9p-flgb2104-2-i",  # VU9P FPGA
+        fpga_part="xc7z020clg400-1",  # Zynq-7020 FPGA
         latency=8              # pipeline depth
     )
 
