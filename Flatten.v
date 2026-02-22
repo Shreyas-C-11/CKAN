@@ -7,7 +7,6 @@
 //   - Asserts flat_valid for 1 cycle when all
 //     ROW_NUM × COLUMN_NUM positions are collected
 //=====================================================
-//
 module Flatten #(
     parameter CHANNELS   = 2,    // Number of feature channels
     parameter DATA_WIDTH = 16,   // Bit-width per channel

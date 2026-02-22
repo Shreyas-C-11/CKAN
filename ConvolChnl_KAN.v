@@ -7,14 +7,14 @@
 //   - All output channels operate in parallel on the
 //     same KxKxCin kernel window
 //=====================================================
-//
 module ConvolChnl_KAN #(
     parameter KERNEL_SIZE     = 3,   // Convolution window size (KxK)
     parameter INPUT_CHANNELS  = 3,   // Number of input feature channels (Cin)
     parameter OUTPUT_CHANNELS = 2,   // Number of output feature channels (Cout)   
     parameter DATA_WIDTH      = 8,   // Input pixel bit-width
     parameter VALUE_WIDTH     = 8,   // KAN LUT output width
-    parameter OUT_WIDTH       = 16   // Accumulator width
+    parameter OUT_WIDTH       = 16,  // Accumulator width
+    parameter MEM_FILE        = "kan_lut.mem"
 )(
     input  wire clock,
     input  wire sreset_n,
@@ -53,7 +53,8 @@ module ConvolChnl_KAN #(
                 .DATA_WIDTH     (DATA_WIDTH),
                 .VALUE_WIDTH    (VALUE_WIDTH),
                 .OUT_WIDTH      (OUT_WIDTH),
-                .FUNC_BITS      (FUNC_BITS)
+                .FUNC_BITS      (FUNC_BITS),
+                .MEM_FILE(MEM_FILE)
             ) mic (
                 .clock      (clock),
                 .sreset_n   (sreset_n),

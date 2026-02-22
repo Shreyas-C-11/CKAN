@@ -36,4 +36,3 @@ module KAN_LUT_ROM #(
     assign data = mem[addr];
 
 endmodule
-//

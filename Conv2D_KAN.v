@@ -10,7 +10,6 @@
 //          ↓
 //       ConvolChnl_KAN   - CKAN feature extraction
 //=====================================================
-//
 module Conv2D_KAN #(
     // ---------------- Image Buffer Parameters ----------------
     parameter KERNEL_SIZE     = 3,   // Convolution window size (KxK)
@@ -23,7 +22,8 @@ module Conv2D_KAN #(
     parameter OUTPUT_CHANNELS  = 2,   // Number of output feature channels (Cout)
     parameter DATA_WIDTH       = 8,   // Input pixel bit-width
     parameter VALUE_WIDTH      = 8,   // KAN LUT output width
-    parameter OUT_WIDTH        = 16   // Accumulator width
+    parameter OUT_WIDTH        = 16,  // Accumulator width
+    parameter MEM_FILE         = "kan_lut.mem"
 )(
     // ---------------- I/O Ports ----------------
     input  wire                                  clock,
@@ -76,7 +76,8 @@ module Conv2D_KAN #(
         .OUTPUT_CHANNELS (OUTPUT_CHANNELS),
         .DATA_WIDTH      (DATA_WIDTH),
         .VALUE_WIDTH     (VALUE_WIDTH),
-        .OUT_WIDTH       (OUT_WIDTH)
+        .OUT_WIDTH       (OUT_WIDTH),
+        .MEM_FILE(MEM_FILE)
     ) ConvolChnl_inst (
         .clock      (clock),
         .sreset_n   (sreset_n),

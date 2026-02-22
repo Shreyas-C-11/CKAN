@@ -15,7 +15,8 @@ module Conv_MIC_KAN #(
     parameter DATA_WIDTH      = 8,   // Input pixel width
     parameter VALUE_WIDTH     = 8,   // KAN LUT output width
     parameter OUT_WIDTH       = 16,  // Accumulator width
-    parameter FUNC_BITS       = 8    // Number of bits for function ID in KAN LUT
+    parameter FUNC_BITS       = 8,   // Number of bits for function ID in KAN LUT
+    parameter MEM_FILE        = "kan_lut.mem"
 )(
     input  wire clock,
     input  wire sreset_n,
@@ -52,7 +53,8 @@ module Conv_MIC_KAN #(
                 .DATA_WIDTH  (DATA_WIDTH),
                 .VALUE_WIDTH (VALUE_WIDTH),
                 .OUT_WIDTH   (OUT_WIDTH),
-                .FUNC_BITS   (FUNC_BITS)
+                .FUNC_BITS   (FUNC_BITS),
+                .MEM_FILE(MEM_FILE)
             ) sic (
                 .clock      (clock),
                 .sreset_n   (sreset_n),
@@ -66,29 +68,39 @@ module Conv_MIC_KAN #(
             );
         end
     endgenerate
-    //
 
     //=====================================================
-    // Cross-channel accumulation
+    // Cross-channel accumulation (full-precision + saturate)
     //=====================================================
     // Sum partial CKAN outputs from all input channels
-    reg signed [OUT_WIDTH-1:0] sum;
+    // Use wider accumulator to avoid overflow, then saturate
+    localparam MIC_ACC_BITS = $clog2(INPUT_CHANNELS) > 0 ? $clog2(INPUT_CHANNELS) : 1;
+    localparam MIC_ACC_WIDTH = OUT_WIDTH + MIC_ACC_BITS;
+
+    reg signed [MIC_ACC_WIDTH-1:0] sum_wide;
     integer j;
     always @(*) begin
-        sum = 0;
+        sum_wide = 0;
         for (j = 0; j < INPUT_CHANNELS; j = j + 1)
-            sum = sum + ch_out[j];
+            sum_wide = sum_wide + {{MIC_ACC_BITS{ch_out[j][OUT_WIDTH-1]}}, ch_out[j]};
     end
+
+    // Signed saturator: MIC_ACC_WIDTH → OUT_WIDTH
+    localparam signed [MIC_ACC_WIDTH-1:0] MIC_SAT_MAX = {{(MIC_ACC_BITS+1){1'b0}}, {(OUT_WIDTH-1){1'b1}}};
+    localparam signed [MIC_ACC_WIDTH-1:0] MIC_SAT_MIN = {{(MIC_ACC_BITS+1){1'b1}}, {(OUT_WIDTH-1){1'b0}}};
+
+    wire signed [OUT_WIDTH-1:0] sum_sat;
+    assign sum_sat = (sum_wide > MIC_SAT_MAX) ? MIC_SAT_MAX[OUT_WIDTH-1:0] :
+                     (sum_wide < MIC_SAT_MIN) ? MIC_SAT_MIN[OUT_WIDTH-1:0] :
+                     sum_wide[OUT_WIDTH-1:0];
 
     //=====================================================
     // Outputs
     //=====================================================
-    // Final CKAN output for this output channel
-    assign conv_out = sum;
+    // Final CKAN output for this output channel (saturated)
+    assign conv_out = sum_sat;
 
     // Global valid signal 
-    //to be precise the valid signal should be set after calculating sum
-    //not after calculating partial sums.
     assign conv_valid = ch_valid[0];
 
 endmodule

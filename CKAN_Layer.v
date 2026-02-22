@@ -26,6 +26,7 @@ module CKAN_Layer #(
     parameter DATA_WIDTH       = 8,   // Input pixel bit-width
     parameter VALUE_WIDTH      = 8,   // KAN LUT output width
     parameter OUT_WIDTH        = 16,  // Accumulator / conv output width
+    parameter MEM_FILE         = "kan_lut.mem",
 
     // ---------------- Pooling Parameters ----------------
     parameter POOL_SIZE        = 2,   // Pooling window size (PxP)
@@ -65,7 +66,8 @@ module CKAN_Layer #(
         .OUTPUT_CHANNELS (OUTPUT_CHANNELS),
         .DATA_WIDTH      (DATA_WIDTH),
         .VALUE_WIDTH     (VALUE_WIDTH),
-        .OUT_WIDTH       (OUT_WIDTH)
+        .OUT_WIDTH       (OUT_WIDTH),
+        .MEM_FILE(MEM_FILE)
     ) conv_layer (
         .clock      (clock),
         .data_valid (data_valid),
@@ -96,4 +98,3 @@ module CKAN_Layer #(
     );
 
 endmodule
-//

@@ -103,4 +103,3 @@ module MaxPool2D #(
     assign pool_valid = ch_pool_valid[0];
 
 endmodule
-//
