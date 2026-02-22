@@ -3,12 +3,13 @@
 // Description:
 //   - Design-Under-Test wrapper targeting MNIST
 //   - MNIST: 28×28 grayscale (1 channel, 4-bit pixels)
+//   - OUT_WIDTH == VALUE_WIDTH (saturated conv output)
+//   - Per-layer LUT files: kan_lut1.mem, kan_lut2.mem
 //   - Architecture:
 //       Layer 1: 28×28×1 → Conv 3×3 → 26×26×2 → Pool 2×2 → 13×13×2
 //       Layer 2: 13×13×2 → Conv 3×3 → 11×11×2 → Pool 2×2 →  5×5×2
 //       Flatten: 5×5×2×8b = 400-bit output vector
 //=====================================================
-//
 module CKAN_Model_DUT (
     input  wire        clock,
     input  wire        sreset_n,
@@ -42,14 +43,18 @@ module CKAN_Model_DUT (
         // Layer 2
         .L2_OUTPUT_CHANNELS  (2),
 
-        // Shared CKAN
-        .VALUE_WIDTH         (4),
+        // Shared CKAN (OUT_WIDTH == VALUE_WIDTH for saturated output)
+        .VALUE_WIDTH         (8),
         .OUT_WIDTH           (8),
 
         // Shared pool
         .POOL_SIZE           (2),
         .POOL_STRIDE         (2),
-        .SIGNED_DATA         (1)
+        .SIGNED_DATA         (1),
+
+        // Per-layer LUT files
+        .L1_MEM_FILE         ("kan_lut1.mem"),
+        .L2_MEM_FILE         ("kan_lut2.mem")
     ) model_inst (
         .clock         (clock),
         .sreset_n      (sreset_n),

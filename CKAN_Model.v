@@ -14,7 +14,6 @@
 //          ↓
 //       Flatten → flat_out + flat_valid
 //=====================================================
-//
 module CKAN_Model #(
     // ---------------- Image Parameters ----------------
     parameter IMG_WIDTH        = 5,
@@ -28,13 +27,15 @@ module CKAN_Model #(
     parameter L1_INPUT_CHANNELS  = 3,
     parameter L1_OUTPUT_CHANNELS = 2,
     parameter L1_DATA_WIDTH      = 8,
+    parameter L1_MEM_FILE    = "kan_lut1.mem",
 
     // ---------------- Layer 2 Parameters ----------------
     parameter L2_OUTPUT_CHANNELS = 2,
+    parameter L2_MEM_FILE    = "kan_lut2.mem",
 
     // ---------------- Shared CKAN Parameters ----------------
-    parameter VALUE_WIDTH      = 8,
-    parameter OUT_WIDTH        = 16,
+    parameter VALUE_WIDTH      = 4,
+    parameter OUT_WIDTH        = 8,
 
     // ---------------- Shared Pool Parameters ----------------
     parameter POOL_SIZE        = 2,
@@ -100,7 +101,8 @@ module CKAN_Model #(
         .OUT_WIDTH       (OUT_WIDTH),
         .POOL_SIZE       (POOL_SIZE),
         .POOL_STRIDE     (POOL_STRIDE),
-        .SIGNED_DATA     (SIGNED_DATA)
+        .SIGNED_DATA     (SIGNED_DATA),
+        .MEM_FILE        (L1_MEM_FILE)
     ) layer1 (
         .clock      (clock),
         .sreset_n   (sreset_n),
@@ -127,7 +129,8 @@ module CKAN_Model #(
         .OUT_WIDTH       (OUT_WIDTH),
         .POOL_SIZE       (POOL_SIZE),
         .POOL_STRIDE     (POOL_STRIDE),
-        .SIGNED_DATA     (SIGNED_DATA)
+        .SIGNED_DATA     (SIGNED_DATA),
+        .MEM_FILE        (L2_MEM_FILE)
     ) layer2 (
         .clock      (clock),
         .sreset_n   (sreset_n),

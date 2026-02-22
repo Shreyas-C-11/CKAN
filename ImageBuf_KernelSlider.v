@@ -118,4 +118,3 @@ module ImageBuf_KernelSlider#(
     end
     
 endmodule
-//
