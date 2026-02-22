@@ -1,26 +1,39 @@
 `timescale 1ns / 1ps
 
 //=====================================================
-// Testbench: tb_dut
-// Description:
-//   - Drives CKAN_Model_DUT with a 28×28 test image
-//   - Uses per-layer LUT files:
-//       kan_lut1.mem (512 entries, Layer 1)
-//       kan_lut2.mem (16384 entries, Layer 2)
-//   - OUT_WIDTH == VALUE_WIDTH == 8 (saturated conv output)
-//   - Monitors intermediate conv/pool outputs and
-//     final flattened output
-//   - Feeds two full images to verify pipeline reuse
+// Testbench: tb_dut (SIMPLE DEMO)
 //
-//   Architecture:
-//     Layer 1: 28×28×1 → Conv 3×3 → 26×26×2 → Pool 2×2 → 13×13×2
-//     Layer 2: 13×13×2 → Conv 3×3 → 11×11×2 → Pool 2×2 →  5×5×2
-//     Flatten: 5×5×2×8b = 400-bit output vector
+// Purpose:
+//   Easy-to-trace simulation with predictable values.
+//   All KAN LUT entries = 01 → every lookup returns +1.
+//   Input pixel = 1 (constant).
 //
-//   Expected output counts per image:
-//     L1 pool: 13×13 = 169
-//     L2 pool:  5×5  =  25
-//     Flat valid:        1
+// Expected hand-trace (all LUT entries = +1):
+//   ┌──────────────────────────────────────────────────┐
+//   │ Layer 1 (Cin=1, Cout=2, K=3)                    │
+//   │   SIC: 3×3 pixels → 9 lookups → 9 × (+1) = 9   │
+//   │   MIC: 1 channel  → sum = 9                     │
+//   │   Saturated (8-bit signed): 9                    │
+//   │   Conv output: ch0 = 9, ch1 = 9                 │
+//   │   Pool 2×2: max(9,9,9,9) = 9                    │
+//   │   → l1_pool_out = {8'd9, 8'd9} = 16'h0909      │
+//   ├──────────────────────────────────────────────────┤
+//   │ Layer 2 (Cin=2, Cout=2, K=3)                    │
+//   │   SIC: 3×3 pixels → 9 lookups → 9 × (+1) = 9   │
+//   │   MIC: 2 channels → sum = 9 + 9 = 18            │
+//   │   Saturated (8-bit signed): 18                   │
+//   │   Conv output: ch0 = 18, ch1 = 18               │
+//   │   Pool 2×2: max(18,18,18,18) = 18               │
+//   │   → l2_pool_out = {8'd18, 8'd18} = 16'h1212    │
+//   ├──────────────────────────────────────────────────┤
+//   │ Flatten: 5×5×2 values, all = 18                 │
+//   │   → flat_out = 400 bits, all bytes = 8'h12      │
+//   └──────────────────────────────────────────────────┘
+//
+// Expected output counts (one image):
+//   L1 pool: 13×13 = 169 valid pulses
+//   L2 pool:  5×5  =  25 valid pulses
+//   Flat:            1 valid pulse
 //=====================================================
 
 module tb_dut;
@@ -31,10 +44,9 @@ module tb_dut;
     parameter CLK_PERIOD  = 8;        // 125 MHz clock
     parameter IMG_WIDTH   = 28;
     parameter IMG_HEIGHT  = 28;
-    parameter TOTAL_PX    = IMG_WIDTH * IMG_HEIGHT;  // 784 pixels per image
-    parameter NUM_IMAGES  = 2;         // Number of images to feed
+    parameter TOTAL_PX    = IMG_WIDTH * IMG_HEIGHT;  // 784 pixels
 
-    // Expected output counts per image
+    // Expected output counts
     parameter L1_POOL_EXPECTED = 169;  // 13×13
     parameter L2_POOL_EXPECTED = 25;   //  5×5
     parameter FLAT_EXPECTED    = 1;
@@ -77,16 +89,16 @@ module tb_dut;
     always #(CLK_PERIOD/2) clock = ~clock;
 
     //=====================================================
-    // Event Counters (for monitoring)
+    // Event Counters
     //=====================================================
     integer l1_pool_count;
     integer l2_pool_count;
     integer flat_count;
-    integer img_idx;
     integer errors;
 
     //=====================================================
     // Monitor Layer 1 Pooled Output
+    //   Expected: ch0 = 9, ch1 = 9 (every cycle)
     //=====================================================
     always @(posedge clock) begin
         if (!sreset_n) begin
@@ -94,7 +106,7 @@ module tb_dut;
         end
         else if (l1_pool_valid) begin
             l1_pool_count <= l1_pool_count + 1;
-            $display("[%0t] L1_POOL[%0d]: ch0=%0d ch1=%0d",
+            $display("[%0t] L1_POOL[%0d]: ch0=%0d ch1=%0d  (expect 9, 9)",
                      $time, l1_pool_count,
                      $signed(l1_pool_out[7:0]),
                      $signed(l1_pool_out[15:8]));
@@ -103,6 +115,7 @@ module tb_dut;
 
     //=====================================================
     // Monitor Layer 2 Pooled Output
+    //   Expected: ch0 = 18, ch1 = 18 (every cycle)
     //=====================================================
     always @(posedge clock) begin
         if (!sreset_n) begin
@@ -110,7 +123,7 @@ module tb_dut;
         end
         else if (l2_pool_valid) begin
             l2_pool_count <= l2_pool_count + 1;
-            $display("[%0t] L2_POOL[%0d]: ch0=%0d ch1=%0d",
+            $display("[%0t] L2_POOL[%0d]: ch0=%0d ch1=%0d  (expect 18, 18)",
                      $time, l2_pool_count,
                      $signed(l2_pool_out[7:0]),
                      $signed(l2_pool_out[15:8]));
@@ -119,6 +132,7 @@ module tb_dut;
 
     //=====================================================
     // Monitor Flatten Output
+    //   Expected: all bytes = 0x12 (decimal 18)
     //=====================================================
     always @(posedge clock) begin
         if (!sreset_n) begin
@@ -127,43 +141,56 @@ module tb_dut;
         else if (flat_valid) begin
             flat_count <= flat_count + 1;
             $display("[%0t] ===== FLAT_VALID #%0d =====", $time, flat_count);
-            $display("  flat_out[15:0]   = %h", flat_out[15:0]);
-            $display("  flat_out[31:16]  = %h", flat_out[31:16]);
-            $display("  flat_out[399:384]= %h", flat_out[399:384]);
+            $display("  flat_out[7:0]     = 0x%h (expect 0x12 = 18)", flat_out[7:0]);
+            $display("  flat_out[15:8]    = 0x%h (expect 0x12 = 18)", flat_out[15:8]);
+            $display("  flat_out[399:392] = 0x%h (expect 0x12 = 18)", flat_out[399:392]);
         end
     end
 
     //=====================================================
-    // X/Z Checker — flags if outputs contain X or Z
+    // Value Checker — verify expected outputs
     //=====================================================
     always @(posedge clock) begin
+        // Check L1 pool values (expect 9 on both channels)
         if (sreset_n && l1_pool_valid) begin
             if (^l1_pool_out === 1'bx) begin
-                $display("[%0t] WARNING: l1_pool_out contains X/Z!", $time);
+                $display("[%0t] ERROR: l1_pool_out contains X/Z!", $time);
+                errors = errors + 1;
+            end
+            else if (l1_pool_out !== 16'h0909) begin
+                $display("[%0t] MISMATCH: l1_pool_out = 0x%h, expected 0x0909", $time, l1_pool_out);
                 errors = errors + 1;
             end
         end
+
+        // Check L2 pool values (expect 18 on both channels)
         if (sreset_n && l2_pool_valid) begin
             if (^l2_pool_out === 1'bx) begin
-                $display("[%0t] WARNING: l2_pool_out contains X/Z!", $time);
+                $display("[%0t] ERROR: l2_pool_out contains X/Z!", $time);
+                errors = errors + 1;
+            end
+            else if (l2_pool_out !== 16'h1212) begin
+                $display("[%0t] MISMATCH: l2_pool_out = 0x%h, expected 0x1212", $time, l2_pool_out);
                 errors = errors + 1;
             end
         end
+
+        // Check flat output (expect all bytes = 0x12)
         if (sreset_n && flat_valid) begin
             if (^flat_out === 1'bx) begin
-                $display("[%0t] WARNING: flat_out contains X/Z!", $time);
+                $display("[%0t] ERROR: flat_out contains X/Z!", $time);
                 errors = errors + 1;
             end
         end
     end
 
     //=====================================================
-    // Main Stimulus
+    // Main Stimulus — Feed ONE 28×28 image, all pixels = 1
     //=====================================================
     integer px;
 
     initial begin
-        // ---- Waveform dump (for viewer tools) ----
+        // ---- Waveform dump ----
         $dumpfile("tb_dut.vcd");
         $dumpvars(0, tb_dut);
 
@@ -173,74 +200,63 @@ module tb_dut;
         pixel_in   = 0;
         errors     = 0;
 
-        // ---- Reset ----
+        // ---- Reset (5 cycles) ----
         repeat (5) @(posedge clock);
         sreset_n = 1;
         @(posedge clock);
 
         $display("========================================");
-        $display(" CKAN Model DUT Testbench Started");
-        $display(" Image size: %0d x %0d = %0d pixels",
-                 IMG_WIDTH, IMG_HEIGHT, TOTAL_PX);
-        $display(" LUT files: kan_lut1.mem (L1), kan_lut2.mem (L2)");
-        $display(" VALUE_WIDTH=8, OUT_WIDTH=8 (saturated)");
-        $display(" Expected per image:");
-        $display("   L1 pool outputs: %0d", L1_POOL_EXPECTED);
-        $display("   L2 pool outputs: %0d", L2_POOL_EXPECTED);
-        $display("   Flat valid:      %0d", FLAT_EXPECTED);
+        $display(" SIMPLE DEMO — CKAN Model DUT");
+        $display("========================================");
+        $display(" Image:  28x28 = 784 pixels, all = 1");
+        $display(" LUTs:   all entries = +1");
+        $display("----------------------------------------");
+        $display(" Expected outputs:");
+        $display("   L1 pool: ch0=9, ch1=9   (169 outputs)");
+        $display("   L2 pool: ch0=18, ch1=18 (25 outputs)");
+        $display("   Flat:    all bytes=0x12  (1 output)");
         $display("========================================");
 
-        // ---- Feed images ----
-        for (img_idx = 0; img_idx < NUM_IMAGES; img_idx = img_idx + 1) begin
-            $display("\n--- Feeding Image %0d ---", img_idx);
-
-            for (px = 0; px < TOTAL_PX; px = px + 1) begin
-                @(posedge clock);
-                data_valid = 1;
-                // Constant pixel = 1 for easy hand-tracing
-                // With LUT=1: every KAN lookup returns +1
-                //   L1 SIC sum = 9 (3×3 window, each → +1)
-                //   L1 SIC saturated = 9 (fits in 8-bit signed: max=+127)
-                //   L1 MIC sum = 9 (1 input channel)
-                //   L1 pool = 9
-                //   L2 SIC sum = 9, L2 MIC sum = 9+9=18 (2 channels)
-                //   L2 pool = 18
-                pixel_in = 4'd1;
-            end
-
-            // De-assert valid between images
+        // ---- Feed 784 pixels (all = 1) ----
+        for (px = 0; px < TOTAL_PX; px = px + 1) begin
             @(posedge clock);
-            data_valid = 0;
-            pixel_in   = 0;
-
-            // Wait for pipeline to flush
-            $display("--- Waiting for pipeline to flush ---");
-            repeat (200) @(posedge clock);
+            data_valid = 1;
+            pixel_in   = 4'd1;
         end
 
-        // ---- Final wait and summary ----
+        // ---- De-assert valid ----
+        @(posedge clock);
+        data_valid = 0;
+        pixel_in   = 0;
+
+        // ---- Wait for pipeline to flush ----
+        $display("\n--- Waiting for pipeline to flush ---");
         repeat (500) @(posedge clock);
 
+        // ---- Summary ----
         $display("\n========================================");
         $display(" Simulation Complete");
-        $display(" L1 pool outputs seen:  %0d (expected %0d per image)", l1_pool_count, L1_POOL_EXPECTED);
-        $display(" L2 pool outputs seen:  %0d (expected %0d per image)", l2_pool_count, L2_POOL_EXPECTED);
-        $display(" Flat valid pulses:     %0d (expected %0d per image)", flat_count, FLAT_EXPECTED);
-        $display(" X/Z warnings:          %0d", errors);
-        if (errors == 0)
+        $display("----------------------------------------");
+        $display(" L1 pool outputs: %0d  (expected %0d)", l1_pool_count, L1_POOL_EXPECTED);
+        $display(" L2 pool outputs: %0d  (expected %0d)", l2_pool_count, L2_POOL_EXPECTED);
+        $display(" Flat outputs:    %0d  (expected %0d)", flat_count, FLAT_EXPECTED);
+        $display(" Errors:          %0d", errors);
+        $display("----------------------------------------");
+        if (errors == 0 && l1_pool_count == L1_POOL_EXPECTED &&
+            l2_pool_count == L2_POOL_EXPECTED && flat_count == FLAT_EXPECTED)
             $display(" STATUS: PASS");
         else
-            $display(" STATUS: FAIL — %0d X/Z warnings detected", errors);
+            $display(" STATUS: FAIL");
         $display("========================================");
 
         $finish;
     end
 
     //=====================================================
-    // Timeout watchdog
+    // Timeout watchdog (3 ms — enough for 784 pixels)
     //=====================================================
     initial begin
-        #5000000;  // 5 ms timeout
+        #3000000;
         $display("ERROR: Simulation timed out!");
         $finish;
     end
