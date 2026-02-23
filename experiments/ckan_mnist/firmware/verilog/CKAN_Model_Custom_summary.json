@@ -1,21 +1,23 @@
 {
   "num_layers": 2,
   "input": "28\u00d728\u00d71",
-  "output_flat_width": 800,
+  "output_flat_width": 400,
   "output_elements": 50,
   "layers": [
     {
       "layer_1": {
         "input": "28\u00d728\u00d71",
         "conv_out": "26\u00d726\u00d72",
-        "pool_out": "13\u00d713\u00d72"
+        "pool_out": "13\u00d713\u00d72",
+        "mem_file": "kan_lut_conv0.mem"
       }
     },
     {
       "layer_2": {
         "input": "13\u00d713\u00d72",
         "conv_out": "11\u00d711\u00d72",
-        "pool_out": "5\u00d75\u00d72"
+        "pool_out": "5\u00d75\u00d72",
+        "mem_file": "kan_lut_conv1.mem"
       }
     }
   ]
