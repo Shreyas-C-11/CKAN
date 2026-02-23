@@ -137,27 +137,26 @@ module Conv_SIC_KAN #(
     //=====================================================
     // Output register (pipeline boundary)
     //=====================================================
-    // Registers the saturated KxK sum
+    // Registers the saturated KxK sum only when valid data is present
     always @(posedge clock) begin
-        if (!sreset_n)  conv_out <= 0;
-        else            conv_out <= saturated;
+        if (!sreset_n)       conv_out <= 0;
+        else if (vpipe)      conv_out <= saturated;
     end
 
     //=====================================================
-    // Valid signal pipeline
+    // Valid signal pipeline (2 stages to match data path)
     //=====================================================
-    // Accounts for:
-    //   1 cycle LUT register
-    //   1 cycle output register
-    reg [1:0] vpipe;
+    // Data path: data_valid → lut_r(reg) → conv_out(reg) = 2 cycles
+    // Valid path: data_valid → vpipe(reg) → conv_valid(reg) = 2 cycles
+    reg vpipe;
 
     always @(posedge clock) begin
         if (!sreset_n) begin
-            vpipe      <= 2'b00;
+            vpipe      <= 1'b0;
             conv_valid <= 1'b0;
         end else begin
-            vpipe      <= {vpipe[0], data_valid};
-            conv_valid <= vpipe[1];
+            vpipe      <= data_valid;
+            conv_valid <= vpipe;
         end
     end
 
