@@ -58,18 +58,18 @@ module CKAN_Model_Custom #(
     output wire [FLAT_OUT_WIDTH-1:0]                flat_out,
     output wire                                     flat_valid
 ,
-    output wire [L1_OUTPUT_CHANNELS*L1_VALUE_WIDTH-1:0]  l1_pool_out,
+    output wire [L1_OUTPUT_CHANNELS*OUT_WIDTH-1:0]  l1_pool_out,
     output wire                                     l1_pool_valid,
-    output wire [L2_OUTPUT_CHANNELS*L2_VALUE_WIDTH-1:0]  l2_pool_out,
+    output wire [L2_OUTPUT_CHANNELS*OUT_WIDTH-1:0]  l2_pool_out,
     output wire                                     l2_pool_valid
 );
 
     //=====================================================
     // Internal signals
     //=====================================================
-    wire [L1_OUTPUT_CHANNELS*L1_VALUE_WIDTH-1:0] l1_conv_out;
+    wire [L1_OUTPUT_CHANNELS*OUT_WIDTH-1:0] l1_conv_out;
     wire                                    l1_conv_valid;
-    wire [L2_OUTPUT_CHANNELS*L2_VALUE_WIDTH-1:0] l2_conv_out;
+    wire [L2_OUTPUT_CHANNELS*OUT_WIDTH-1:0] l2_conv_out;
     wire                                    l2_conv_valid;
 
     //=====================================================
@@ -133,7 +133,7 @@ module CKAN_Model_Custom #(
     //=====================================================
     Flatten #(
         .CHANNELS   (L2_OUTPUT_CHANNELS),
-        .DATA_WIDTH (L2_VALUE_WIDTH),
+        .DATA_WIDTH (OUT_WIDTH),
         .COLUMN_NUM (L2_POOL_OUT_W),
         .ROW_NUM    (L2_POOL_OUT_H)
     ) flatten_inst (

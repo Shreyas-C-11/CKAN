@@ -156,7 +156,7 @@ module CKAN_Model_Custom #(
     for i in range(num_layers):
         idx = i + 1
         verilog += f""",
-    output wire [L{idx}_OUTPUT_CHANNELS*L{idx}_VALUE_WIDTH-1:0]  l{idx}_pool_out,
+    output wire [L{idx}_OUTPUT_CHANNELS*OUT_WIDTH-1:0]  l{idx}_pool_out,
     output wire                                     l{idx}_pool_valid"""
     
     verilog += """
@@ -170,7 +170,7 @@ module CKAN_Model_Custom #(
     # Generate internal signal declarations
     for i in range(num_layers):
         idx = i + 1
-        verilog += f"""    wire [L{idx}_OUTPUT_CHANNELS*L{idx}_VALUE_WIDTH-1:0] l{idx}_conv_out;
+        verilog += f"""    wire [L{idx}_OUTPUT_CHANNELS*OUT_WIDTH-1:0] l{idx}_conv_out;
     wire                                    l{idx}_conv_valid;
 """
     
@@ -229,7 +229,7 @@ module CKAN_Model_Custom #(
     //=====================================================
     Flatten #(
         .CHANNELS   (L{last_idx}_OUTPUT_CHANNELS),
-        .DATA_WIDTH (L{last_idx}_VALUE_WIDTH),
+        .DATA_WIDTH (OUT_WIDTH),
         .COLUMN_NUM (L{last_idx}_POOL_OUT_W),
         .ROW_NUM    (L{last_idx}_POOL_OUT_H)
     ) flatten_inst (
