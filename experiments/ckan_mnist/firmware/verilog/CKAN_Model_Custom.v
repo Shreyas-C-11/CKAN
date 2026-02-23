@@ -85,7 +85,8 @@ module CKAN_Model_Custom #(
         .OUT_WIDTH       (OUT_WIDTH),
         .POOL_SIZE       (POOL_SIZE),
         .POOL_STRIDE     (POOL_STRIDE),
-        .SIGNED_DATA     (SIGNED_DATA)
+        .SIGNED_DATA     (SIGNED_DATA),
+        .MEM_FILE        (L1_MEM_FILE)
     ) layer1 (
         .clock      (clock),
         .sreset_n   (sreset_n),
@@ -112,7 +113,8 @@ module CKAN_Model_Custom #(
         .OUT_WIDTH       (OUT_WIDTH),
         .POOL_SIZE       (POOL_SIZE),
         .POOL_STRIDE     (POOL_STRIDE),
-        .SIGNED_DATA     (SIGNED_DATA)
+        .SIGNED_DATA     (SIGNED_DATA),
+        .MEM_FILE        (L2_MEM_FILE)
     ) layer2 (
         .clock      (clock),
         .sreset_n   (sreset_n),
