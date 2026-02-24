@@ -54,7 +54,7 @@ def find_latest_checkpoint(path_like: str) -> Optional[str]:
 seed = 3321
 torch.manual_seed(seed)
 np.random.seed(seed)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:2' if torch.cuda.is_available() else 'cpu')
 
 # ─── Logging ─────────────────────────────────────────────────────────
 os.makedirs('checkpoints', exist_ok=True)
