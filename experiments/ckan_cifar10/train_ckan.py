@@ -1,4 +1,4 @@
-# train_ckan.py — Train CKAN (Conv KAN + KAN MLP) on MNIST
+# train_ckan.py — Train CKAN (Conv KAN + KAN MLP) on CIFAR-10
 #
 # Usage:  python train_ckan.py
 #
@@ -50,7 +50,7 @@ def find_latest_checkpoint(path_like: str) -> Optional[str]:
 seed = 3321
 torch.manual_seed(seed)
 np.random.seed(seed)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 
 # ─── Logging ─────────────────────────────────────────────────────────
 os.makedirs('checkpoints', exist_ok=True)
@@ -65,40 +65,47 @@ console.setFormatter(logging.Formatter('%(message)s'))
 logging.getLogger().addHandler(console)
 
 # ═══════════════════════════════════════════════════════════════════════
-# Configuration
+# Configuration  —  PYNQ Z2 (XC7Z020) edition
 # ═══════════════════════════════════════════════════════════════════════
 #
+# PYNQ Z2 resource budget (Zynq XC7Z020-1CLG400C):
+#   ~53 200 LUTs, 140 BRAM36, 220 DSP48
+#
 # Design philosophy:
-#   CKAN conv layers  = spatial compressor (4-bit color in → small feature map)
-#   Kanele KAN MLP    = classifier (small flat vector → class logits)
+#   1. Keep conv channels tiny (4) to minimise KAN edge count.
+#   2. Use grid_size=5 (8 spline coeffs/edge) instead of 15 (18).
+#   3. Use 4-bit precision throughout → halves BRAM vs 8-bit.
+#   4. Three stride-1 conv + pool stages shrink 32×32 → 2×2 before
+#      flattening, giving a 16-element MLP input instead of 576.
 #
-# Architecture matches Verilog CKAN_Model.v:
-#   - Stride-1 convolutions for feature extraction
-#   - 2×2 max pooling for spatial downsampling
-#   - This differs from pure stride-2 conv; pooling preserves more features
+# Architecture (stride-1 conv, 2×2 max-pool after each):
+#   3×32×32 →[4-bit]→ CKANConv 3→4  K=3 S=1 → 4×30×30  → Pool → 4×15×15
+#                    → CKANConv 4→4  K=3 S=1 → 4×13×13  → Pool → 4×6×6
+#                    → CKANConv 4→4  K=3 S=1 → 4×4×4    → Pool → 4×2×2
+#                    → Flatten(16)  → Kanele MLP  16→16→10
 #
-# ─── MNIST (1ch grayscale) ───
-#   1×28×28 →[8-bit]→ CKANConv 1→2 K=3 S=1 → 26×26×2 → Pool 2×2 → 13×13×2
-#                    → CKANConv 2→2 K=3 S=1 → 11×11×2 → Pool 2×2 →  5×5×2
-#                    → Flatten(50) → Kanele MLP 50→32→10
-#
-# ─── CIFAR-10 (3ch color) — uncomment to use ───
-#   3×32×32 →[8-bit]→ CKANConv 3→8  K=3 S=1 → 30×30×8  → Pool 2×2 → 15×15×8
-#                    → CKANConv 8→16 K=3 S=1 → 13×13×16 → Pool 2×2 →  6×6×16
-#                    → Flatten(576) → Kanele MLP 576→64→10
+# Estimated KAN edge counts (edges × 8 spline coeffs each):
+#   Conv0: 27×4  = 108 edges  →   864 LUT entries
+#   Conv1: 36×4  = 144 edges  → 1 152 LUT entries
+#   Conv2: 36×4  = 144 edges  → 1 152 LUT entries
+#   MLP0:  16×16 = 256 edges  → 2 048 LUT entries
+#   MLP1:  16×10 = 160 edges  → 1 280 LUT entries
+#   TOTAL: 812 edges           → 6 496 LUT entries  ← fits Z2
 #
 
-# ── MNIST config (matches Verilog CKAN_Model_DUT.v) ──
+# ── CIFAR-10 config (PYNQ Z2) ──
 config = {
-    "image_height": 28,
-    "image_width": 28,
+    "image_height": 32,
+    "image_width": 32,
 
-    # CKAN conv: stride-1 convolutions with 2×2 pooling
+    # CKAN conv: compress 3-channel color → 4×2×2
     "conv_layers": [
-        {"in_channels": 1, "out_channels": 2, "kernel_size": 3, "stride": 1,
-         "in_precision": 4, "out_precision": 8},     # 1×28×28 → 2×26×26 → pool → 2×13×13
-        {"in_channels": 2, "out_channels": 2, "kernel_size": 3, "stride": 1,
-         "in_precision": 8, "out_precision": 8},   # 2×13×13 → 2×11×11 → pool → 2×5×5
+        {"in_channels": 3, "out_channels": 4, "kernel_size": 3, "stride": 1,
+         "in_precision": 4, "out_precision": 4},     # 3×32×32 → 4×30×30 → pool → 4×15×15
+        {"in_channels": 4, "out_channels": 4, "kernel_size": 3, "stride": 1,
+         "in_precision": 4, "out_precision": 4},     # 4×15×15 → 4×13×13 → pool → 4×6×6
+        {"in_channels": 4, "out_channels": 4, "kernel_size": 3, "stride": 1,
+         "in_precision": 4, "out_precision": 4},     # 4×6×6   → 4×4×4   → pool → 4×2×2
     ],
 
     # Pooling (applied after each conv layer)
@@ -106,27 +113,27 @@ config = {
     "pool_stride": 2,
 
     # Kanele MLP: classify the compressed features
-    "mlp_layers": [50,10],     # 2×5×5 = 50 → 10 classes
-    "mlp_bitwidth": [8, 8],
+    "mlp_layers": [16, 16, 10],     # 4×2×2 = 16 → 16 → 10 classes
+    "mlp_bitwidth": [4, 4, 4],
 
-    # shared KAN hyper-params
-    "grid_size": 15,
+    # shared KAN hyper-params  (grid_size=5 → 8 coeffs/edge)
+    "grid_size": 5,
     "spline_order": 3,
     "grid_eps": 0.05,
     "grid_range": [-4, 4],
     "base_activation": "nn.SiLU",
 
-    # training
-    "batch_size": 256,
-    "num_epochs": 200,
+    # training — more epochs to compensate for smaller capacity
+    "batch_size": 128,
+    "num_epochs": 400,
     "learning_rate": 1e-2,
     "weight_decay": 1e-4,
-    "scheduler_gamma": 0.995,
+    "scheduler_gamma": 0.997,
 
     # pruning
-    "prune_threshold": 0.3,
-    "target_epoch": 20,
-    "warmup_epochs": 5,
+    "prune_threshold": 0.25,
+    "target_epoch": 30,
+    "warmup_epochs": 10,
     "random_seed": seed,
 
     # input quantization — 4-bit gives 16 levels per pixel
@@ -136,48 +143,6 @@ config = {
     "resume": False,
     "resume_path": "models/",
 }
-
-# # ── CIFAR-10 config (uncomment to use) ──
-# config = {
-#     "image_height": 32,
-#     "image_width": 32,
-#
-#     # CKAN conv: compress 3-channel 4-bit color → 16×6×6
-#     "conv_layers": [
-#         {"in_channels": 3,  "out_channels": 8,  "kernel_size": 3, "stride": 1,
-#          "in_precision": 4, "out_precision": 6},       # 3×32×32 → 8×30×30
-#         {"in_channels": 8,  "out_channels": 16, "kernel_size": 3, "stride": 2,
-#          "in_precision": 6, "out_precision": 6},        # 8×30×30 → 16×14×14
-#         {"in_channels": 16, "out_channels": 16, "kernel_size": 3, "stride": 2,
-#          "in_precision": 6, "out_precision": 6},        # 16×14×14 → 16×6×6
-#     ],
-#
-#     # Kanele MLP: classify the compressed features
-#     "mlp_layers": [576, 64, 10],    # 16×6×6 = 576 → 64 → 10 classes
-#     "mlp_bitwidth": [6, 6, 6],
-#
-#     "grid_size": 15,
-#     "spline_order": 3,
-#     "grid_eps": 0.05,
-#     "grid_range": [-4, 4],
-#     "base_activation": "nn.SiLU",
-#
-#     "batch_size": 128,
-#     "num_epochs": 300,
-#     "learning_rate": 1e-2,
-#     "weight_decay": 1e-4,
-#     "scheduler_gamma": 0.995,
-#
-#     "prune_threshold": 0.3,
-#     "target_epoch": 25,
-#     "warmup_epochs": 5,
-#     "random_seed": seed,
-#
-#     "input_bitwidth": 4,    # 4-bit: 16 levels per channel per pixel
-#
-#     "resume": False,
-#     "resume_path": "models/",
-# }
 
 # ─── Resume logic ────────────────────────────────────────────────────
 resume_checkpoint_path = None
@@ -198,7 +163,7 @@ with open(f'{model_dir}/config.json', 'w') as f:
     json.dump(config, f, indent=2)
 
 # ─── Input layer (pixel quantization) ────────────────────────────────
-bn_in = nn.BatchNorm1d(28 * 28)
+bn_in = nn.BatchNorm1d(3 * 32 * 32)
 nn.init.constant_(bn_in.weight.data, 1)
 nn.init.constant_(bn_in.bias.data, 0)
 input_bias = ScalarBiasScale(scale=False, bias_init=-0.25)
@@ -212,16 +177,22 @@ input_layer = QuantBrevitasActivation(
         return_quant_tensor=False,
     ),
     pre_transforms=[bn_in, input_bias],
-    cuda=device.type == 'cuda',
+    cuda=device.type == 'cuda',  # bool flag; GPU 1 selection is via .to(device)
 ).to(device)
 
 # ─── Data ────────────────────────────────────────────────────────────
-transform = transforms.Compose([
+transform_train = transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,)),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
 ])
-trainset = torchvision.datasets.MNIST(root='./data', train=True,  download=False, transform=transform)
-valset   = torchvision.datasets.MNIST(root='./data', train=False, download=False, transform=transform)
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
+])
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True,  download=True, transform=transform_train)
+valset   = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
 trainloader = DataLoader(trainset, batch_size=config['batch_size'], shuffle=True)
 valloader   = DataLoader(valset,   batch_size=config['batch_size'], shuffle=False)
 
@@ -255,7 +226,7 @@ def validate():
     val_loss = val_acc = 0.0
     with torch.no_grad():
         for images, labels in valloader:
-            images = images.view(-1, 28 * 28).to(device)
+            images = images.view(-1, 3 * 32 * 32).to(device)
             labels = labels.to(device)
             output = model(images)
             val_loss += criterion(output, labels).item()
@@ -269,7 +240,7 @@ for epoch in range(resume_start_epoch, config['num_epochs']):
     model.train()
     with tqdm(trainloader, desc=f"Epoch {epoch+1}/{config['num_epochs']}") as pbar:
         for images, labels in pbar:
-            images = images.view(-1, 28 * 28).to(device)
+            images = images.view(-1, 3 * 32 * 32).to(device)
             labels = labels.to(device)
 
             optimizer.zero_grad()

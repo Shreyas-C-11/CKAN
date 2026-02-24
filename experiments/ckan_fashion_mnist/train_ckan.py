@@ -1,9 +1,13 @@
-# train_ckan.py — Train CKAN (Conv KAN + KAN MLP) on MNIST
+# train_ckan.py — Train CKAN (Conv KAN + KAN MLP) on Fashion-MNIST
 #
 # Usage:  python train_ckan.py
 #
 # Based on the existing Kanele train_quant.py but replaces the flat
 # KAN MLP with CKANConv2d → flatten → KANLinear MLP.
+#
+# Fashion-MNIST classes:
+#   0: T-shirt/top, 1: Trouser, 2: Pullover, 3: Dress, 4: Coat,
+#   5: Sandal, 6: Shirt, 7: Sneaker, 8: Bag, 9: Ankle boot
 
 import sys, os, glob, logging, re, json, math
 from datetime import datetime
@@ -65,11 +69,11 @@ console.setFormatter(logging.Formatter('%(message)s'))
 logging.getLogger().addHandler(console)
 
 # ═══════════════════════════════════════════════════════════════════════
-# Configuration
+# Configuration — Fashion-MNIST (PYNQ Z2)
 # ═══════════════════════════════════════════════════════════════════════
 #
 # Design philosophy:
-#   CKAN conv layers  = spatial compressor (4-bit color in → small feature map)
+#   CKAN conv layers  = spatial compressor (4-bit grayscale in → small feature map)
 #   Kanele KAN MLP    = classifier (small flat vector → class logits)
 #
 # Architecture matches Verilog CKAN_Model.v:
@@ -77,18 +81,13 @@ logging.getLogger().addHandler(console)
 #   - 2×2 max pooling for spatial downsampling
 #   - This differs from pure stride-2 conv; pooling preserves more features
 #
-# ─── MNIST (1ch grayscale) ───
-#   1×28×28 →[8-bit]→ CKANConv 1→2 K=3 S=1 → 26×26×2 → Pool 2×2 → 13×13×2
-#                    → CKANConv 2→2 K=3 S=1 → 11×11×2 → Pool 2×2 →  5×5×2
-#                    → Flatten(50) → Kanele MLP 50→32→10
-#
-# ─── CIFAR-10 (3ch color) — uncomment to use ───
-#   3×32×32 →[8-bit]→ CKANConv 3→8  K=3 S=1 → 30×30×8  → Pool 2×2 → 15×15×8
-#                    → CKANConv 8→16 K=3 S=1 → 13×13×16 → Pool 2×2 →  6×6×16
-#                    → Flatten(576) → Kanele MLP 576→64→10
+# ─── Fashion-MNIST (1ch grayscale, 28×28) ───
+#   1×28×28 →[4-bit]→ CKANConv 1→2 K=3 S=1 → 2×26×26 → Pool 2×2 → 2×13×13
+#                    → CKANConv 2→2 K=3 S=1 → 2×11×11 → Pool 2×2 → 2×5×5
+#                    → Flatten(50) → Kanele MLP 50→10
 #
 
-# ── MNIST config (matches Verilog CKAN_Model_DUT.v) ──
+# ── Fashion-MNIST config (matches Verilog CKAN_Model_DUT.v) ──
 config = {
     "image_height": 28,
     "image_width": 28,
@@ -106,7 +105,7 @@ config = {
     "pool_stride": 2,
 
     # Kanele MLP: classify the compressed features
-    "mlp_layers": [50,10],     # 2×5×5 = 50 → 10 classes
+    "mlp_layers": [50, 10],     # 2×5×5 = 50 → 10 classes
     "mlp_bitwidth": [8, 8],
 
     # shared KAN hyper-params
@@ -116,9 +115,9 @@ config = {
     "grid_range": [-4, 4],
     "base_activation": "nn.SiLU",
 
-    # training
+    # training — slightly longer than MNIST (harder dataset)
     "batch_size": 256,
-    "num_epochs": 200,
+    "num_epochs": 250,
     "learning_rate": 1e-2,
     "weight_decay": 1e-4,
     "scheduler_gamma": 0.995,
@@ -136,48 +135,6 @@ config = {
     "resume": False,
     "resume_path": "models/",
 }
-
-# # ── CIFAR-10 config (uncomment to use) ──
-# config = {
-#     "image_height": 32,
-#     "image_width": 32,
-#
-#     # CKAN conv: compress 3-channel 4-bit color → 16×6×6
-#     "conv_layers": [
-#         {"in_channels": 3,  "out_channels": 8,  "kernel_size": 3, "stride": 1,
-#          "in_precision": 4, "out_precision": 6},       # 3×32×32 → 8×30×30
-#         {"in_channels": 8,  "out_channels": 16, "kernel_size": 3, "stride": 2,
-#          "in_precision": 6, "out_precision": 6},        # 8×30×30 → 16×14×14
-#         {"in_channels": 16, "out_channels": 16, "kernel_size": 3, "stride": 2,
-#          "in_precision": 6, "out_precision": 6},        # 16×14×14 → 16×6×6
-#     ],
-#
-#     # Kanele MLP: classify the compressed features
-#     "mlp_layers": [576, 64, 10],    # 16×6×6 = 576 → 64 → 10 classes
-#     "mlp_bitwidth": [6, 6, 6],
-#
-#     "grid_size": 15,
-#     "spline_order": 3,
-#     "grid_eps": 0.05,
-#     "grid_range": [-4, 4],
-#     "base_activation": "nn.SiLU",
-#
-#     "batch_size": 128,
-#     "num_epochs": 300,
-#     "learning_rate": 1e-2,
-#     "weight_decay": 1e-4,
-#     "scheduler_gamma": 0.995,
-#
-#     "prune_threshold": 0.3,
-#     "target_epoch": 25,
-#     "warmup_epochs": 5,
-#     "random_seed": seed,
-#
-#     "input_bitwidth": 4,    # 4-bit: 16 levels per channel per pixel
-#
-#     "resume": False,
-#     "resume_path": "models/",
-# }
 
 # ─── Resume logic ────────────────────────────────────────────────────
 resume_checkpoint_path = None
@@ -216,12 +173,19 @@ input_layer = QuantBrevitasActivation(
 ).to(device)
 
 # ─── Data ────────────────────────────────────────────────────────────
-transform = transforms.Compose([
+# Fashion-MNIST normalization: mean=0.2860, std=0.3530
+transform_train = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(10),
     transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,)),
+    transforms.Normalize((0.2860,), (0.3530,)),
 ])
-trainset = torchvision.datasets.MNIST(root='./data', train=True,  download=False, transform=transform)
-valset   = torchvision.datasets.MNIST(root='./data', train=False, download=False, transform=transform)
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.2860,), (0.3530,)),
+])
+trainset = torchvision.datasets.FashionMNIST(root='./data', train=True,  download=True, transform=transform_train)
+valset   = torchvision.datasets.FashionMNIST(root='./data', train=False, download=True, transform=transform_test)
 trainloader = DataLoader(trainset, batch_size=config['batch_size'], shuffle=True)
 valloader   = DataLoader(valset,   batch_size=config['batch_size'], shuffle=False)
 
