@@ -106,8 +106,8 @@ config = {
     "pool_stride": 2,
 
     # Kanele MLP: classify the compressed features
-    "mlp_layers": [50, 32, 10],     # 2×5×5 = 50 → 32 → 10 classes
-    "mlp_bitwidth": [8, 8, 8],
+    "mlp_layers": [50,10],     # 2×5×5 = 50 → 10 classes
+    "mlp_bitwidth": [8, 8],
 
     # shared KAN hyper-params
     "grid_size": 15,

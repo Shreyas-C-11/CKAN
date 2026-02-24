@@ -91,10 +91,10 @@ with torch.inference_mode():
 
     # 2. Export MLP layers → complete VHDL firmware (VHDL + .mem + TCL)
     mlp_fw_dir = exporter.export_mlp_firmware(
-        clock_period=1.2,      # 833 MHz target
+        clock_period=10.0,     # 100 MHz — PYNQ Z2 fabric clock
         n_add=4,               # adder tree config
-        fpga_part="xc7z020clg400-1",  # Zynq-7020 FPGA
-        latency=8              # pipeline depth
+        fpga_part="xc7z020clg400-1",  # Zynq-7020 (PYNQ Z2)
+        latency=4              # pipeline depth (smaller model)
     )
 
 print(f"\n✓ All firmware files generated:")

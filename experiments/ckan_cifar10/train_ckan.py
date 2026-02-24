@@ -65,35 +65,47 @@ console.setFormatter(logging.Formatter('%(message)s'))
 logging.getLogger().addHandler(console)
 
 # ═══════════════════════════════════════════════════════════════════════
-# Configuration
+# Configuration  —  PYNQ Z2 (XC7Z020) edition
 # ═══════════════════════════════════════════════════════════════════════
 #
+# PYNQ Z2 resource budget (Zynq XC7Z020-1CLG400C):
+#   ~53 200 LUTs, 140 BRAM36, 220 DSP48
+#
 # Design philosophy:
-#   CKAN conv layers  = spatial compressor (4-bit color in → small feature map)
-#   Kanele KAN MLP    = classifier (small flat vector → class logits)
+#   1. Keep conv channels tiny (4) to minimise KAN edge count.
+#   2. Use grid_size=5 (8 spline coeffs/edge) instead of 15 (18).
+#   3. Use 4-bit precision throughout → halves BRAM vs 8-bit.
+#   4. Three stride-1 conv + pool stages shrink 32×32 → 2×2 before
+#      flattening, giving a 16-element MLP input instead of 576.
 #
-# Architecture matches Verilog CKAN_Model.v:
-#   - Stride-1 convolutions for feature extraction
-#   - 2×2 max pooling for spatial downsampling
-#   - This differs from pure stride-2 conv; pooling preserves more features
+# Architecture (stride-1 conv, 2×2 max-pool after each):
+#   3×32×32 →[4-bit]→ CKANConv 3→4  K=3 S=1 → 4×30×30  → Pool → 4×15×15
+#                    → CKANConv 4→4  K=3 S=1 → 4×13×13  → Pool → 4×6×6
+#                    → CKANConv 4→4  K=3 S=1 → 4×4×4    → Pool → 4×2×2
+#                    → Flatten(16)  → Kanele MLP  16→16→10
 #
-# ─── CIFAR-10 (3ch color) ───
-#   3×32×32 →[8-bit]→ CKANConv 3→8  K=3 S=1 → 30×30×8  → Pool 2×2 → 15×15×8
-#                    → CKANConv 8→16 K=3 S=1 → 13×13×16 → Pool 2×2 →  6×6×16
-#                    → Flatten(576) → Kanele MLP 576→64→10
+# Estimated KAN edge counts (edges × 8 spline coeffs each):
+#   Conv0: 27×4  = 108 edges  →   864 LUT entries
+#   Conv1: 36×4  = 144 edges  → 1 152 LUT entries
+#   Conv2: 36×4  = 144 edges  → 1 152 LUT entries
+#   MLP0:  16×16 = 256 edges  → 2 048 LUT entries
+#   MLP1:  16×10 = 160 edges  → 1 280 LUT entries
+#   TOTAL: 812 edges           → 6 496 LUT entries  ← fits Z2
 #
 
-# ── CIFAR-10 config ──
+# ── CIFAR-10 config (PYNQ Z2) ──
 config = {
     "image_height": 32,
     "image_width": 32,
 
-    # CKAN conv: compress 3-channel 4-bit color → 16×6×6
+    # CKAN conv: compress 3-channel color → 4×2×2
     "conv_layers": [
-        {"in_channels": 3,  "out_channels": 8,  "kernel_size": 3, "stride": 1,
-         "in_precision": 4, "out_precision": 8},     # 3×32×32 → 8×30×30 → pool → 8×15×15
-        {"in_channels": 8,  "out_channels": 16, "kernel_size": 3, "stride": 1,
-         "in_precision": 8, "out_precision": 8},      # 8×15×15 → 16×13×13 → pool → 16×6×6
+        {"in_channels": 3, "out_channels": 4, "kernel_size": 3, "stride": 1,
+         "in_precision": 4, "out_precision": 4},     # 3×32×32 → 4×30×30 → pool → 4×15×15
+        {"in_channels": 4, "out_channels": 4, "kernel_size": 3, "stride": 1,
+         "in_precision": 4, "out_precision": 4},     # 4×15×15 → 4×13×13 → pool → 4×6×6
+        {"in_channels": 4, "out_channels": 4, "kernel_size": 3, "stride": 1,
+         "in_precision": 4, "out_precision": 4},     # 4×6×6   → 4×4×4   → pool → 4×2×2
     ],
 
     # Pooling (applied after each conv layer)
@@ -101,27 +113,27 @@ config = {
     "pool_stride": 2,
 
     # Kanele MLP: classify the compressed features
-    "mlp_layers": [576, 64, 10],    # 16×6×6 = 576 → 64 → 10 classes
-    "mlp_bitwidth": [8, 8, 8],
+    "mlp_layers": [16, 16, 10],     # 4×2×2 = 16 → 16 → 10 classes
+    "mlp_bitwidth": [4, 4, 4],
 
-    # shared KAN hyper-params
-    "grid_size": 15,
+    # shared KAN hyper-params  (grid_size=5 → 8 coeffs/edge)
+    "grid_size": 5,
     "spline_order": 3,
     "grid_eps": 0.05,
     "grid_range": [-4, 4],
     "base_activation": "nn.SiLU",
 
-    # training
+    # training — more epochs to compensate for smaller capacity
     "batch_size": 128,
-    "num_epochs": 300,
+    "num_epochs": 400,
     "learning_rate": 1e-2,
     "weight_decay": 1e-4,
-    "scheduler_gamma": 0.995,
+    "scheduler_gamma": 0.997,
 
     # pruning
-    "prune_threshold": 0.3,
-    "target_epoch": 25,
-    "warmup_epochs": 5,
+    "prune_threshold": 0.25,
+    "target_epoch": 30,
+    "warmup_epochs": 10,
     "random_seed": seed,
 
     # input quantization — 4-bit gives 16 levels per pixel
