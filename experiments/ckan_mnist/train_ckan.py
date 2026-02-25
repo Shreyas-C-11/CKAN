@@ -96,9 +96,9 @@ config = {
     # CKAN conv: stride-1 convolutions with 2×2 pooling
     "conv_layers": [
         {"in_channels": 1, "out_channels": 2, "kernel_size": 3, "stride": 1,
-         "in_precision": 4, "out_precision": 8},     # 1×28×28 → 2×26×26 → pool → 2×13×13
+         "in_precision": 4, "out_precision": 6},     # 1×28×28 → 2×26×26 → pool → 2×13×13
         {"in_channels": 2, "out_channels": 2, "kernel_size": 3, "stride": 1,
-         "in_precision": 8, "out_precision": 8},   # 2×13×13 → 2×11×11 → pool → 2×5×5
+         "in_precision": 6, "out_precision": 6},   # 2×13×13 → 2×11×11 → pool → 2×5×5
     ],
 
     # Pooling (applied after each conv layer)
@@ -107,7 +107,7 @@ config = {
 
     # Kanele MLP: classify the compressed features
     "mlp_layers": [50,10],     # 2×5×5 = 50 → 10 classes
-    "mlp_bitwidth": [8, 8],
+    "mlp_bitwidth": [6, 6],
 
     # shared KAN hyper-params
     "grid_size": 15,

@@ -101,11 +101,11 @@ config = {
     # CKAN conv: compress 3-channel color → 4×2×2
     "conv_layers": [
         {"in_channels": 3, "out_channels": 4, "kernel_size": 3, "stride": 1,
-         "in_precision": 4, "out_precision": 4},     # 3×32×32 → 4×30×30 → pool → 4×15×15
+         "in_precision": 8, "out_precision": 8},     # 3×32×32 → 4×30×30 → pool → 4×15×15
         {"in_channels": 4, "out_channels": 4, "kernel_size": 3, "stride": 1,
-         "in_precision": 4, "out_precision": 4},     # 4×15×15 → 4×13×13 → pool → 4×6×6
+         "in_precision": 8, "out_precision": 8},     # 4×15×15 → 4×13×13 → pool → 4×6×6
         {"in_channels": 4, "out_channels": 4, "kernel_size": 3, "stride": 1,
-         "in_precision": 4, "out_precision": 4},     # 4×6×6   → 4×4×4   → pool → 4×2×2
+         "in_precision": 8, "out_precision": 8},     # 4×6×6   → 4×4×4   → pool → 4×2×2
     ],
 
     # Pooling (applied after each conv layer)
@@ -113,8 +113,8 @@ config = {
     "pool_stride": 2,
 
     # Kanele MLP: classify the compressed features
-    "mlp_layers": [16, 16, 10],     # 4×2×2 = 16 → 16 → 10 classes
-    "mlp_bitwidth": [4, 4, 4],
+    "mlp_layers": [16, 10],     # 4×2×2 = 16 → 16 → 10 classes
+    "mlp_bitwidth": [8, 8],
 
     # shared KAN hyper-params  (grid_size=5 → 8 coeffs/edge)
     "grid_size": 5,
