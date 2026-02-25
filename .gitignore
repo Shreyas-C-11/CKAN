@@ -1,0 +1,62 @@
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+*.so
+
+# ── Logs ──
+*.log
+training_*.log
+
+# ── Model checkpoints ──
+models/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+
+# ── Data ──
+experiments/*/data/
+data/
+
+# ── Verilog build / simulation artifacts ──
+*.vcd
+*.lxt
+*.fst
+*.out
+*.exe
+work/
+xsim.dir/
+*.wdb
+*.jou
+*.str
+
+# ── Vivado / FPGA build ──
+*.xpr
+*.runs/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+.Xil/
+
+# ── IDE / OS ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Jupyter ──
+.ipynb_checkpoints/
+
+# ── Environment ──
+.env
+venv/
+env/

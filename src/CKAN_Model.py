@@ -131,12 +131,11 @@ class CKANModel(nn.Module):
         total_nodes = 0
         total_remaining = 0
 
-        # Asymptotic pruning schedule
+        # Linear pruning schedule (gentle ramp from 0 → threshold)
         t = max(epoch - warmup_epochs, 0)
         denom = max(target_epoch - warmup_epochs, 1)
-        k = math.log(20.0) / denom
-        scale = 1.0 - math.exp(-k * t)
-        layer_threshold = min(threshold * scale, threshold)
+        scale = min(t / denom, 1.0)
+        layer_threshold = threshold * scale
 
         all_layers = []
 
