@@ -50,7 +50,7 @@ def find_latest_checkpoint(path_like: str) -> Optional[str]:
 seed = 3321
 torch.manual_seed(seed)
 np.random.seed(seed)
-device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # ─── Logging ─────────────────────────────────────────────────────────
 os.makedirs('checkpoints', exist_ok=True)
@@ -92,52 +92,56 @@ logging.getLogger().addHandler(console)
 #   MLP1:  16×10 = 160 edges  → 1 280 LUT entries
 #   TOTAL: 812 edges           → 6 496 LUT entries  ← fits Z2
 #
-
+print(device)
 # ── CIFAR-10 config (PYNQ Z2) ──
 config = {
     "image_height": 32,
     "image_width": 32,
 
-    # CKAN conv: compress 3-channel color → 4×2×2
+    # 4 CKAN conv layers: 3→32→64→128→128
+    #   Conv3 uses K=1 because spatial is 2×2 at that point (K=3 would crash)
     "conv_layers": [
-        {"in_channels": 3, "out_channels": 4, "kernel_size": 3, "stride": 1,
-         "in_precision": 8, "out_precision": 8},     # 3×32×32 → 4×30×30 → pool → 4×15×15
-        {"in_channels": 4, "out_channels": 4, "kernel_size": 3, "stride": 1,
-         "in_precision": 8, "out_precision": 8},     # 4×15×15 → 4×13×13 → pool → 4×6×6
-        {"in_channels": 4, "out_channels": 4, "kernel_size": 3, "stride": 1,
-         "in_precision": 8, "out_precision": 8},     # 4×6×6   → 4×4×4   → pool → 4×2×2
+        {"in_channels": 3,   "out_channels": 32,  "kernel_size": 3, "stride": 1,
+         "in_precision": 8, "out_precision": 8},     # 3×32×32  → 32×30×30 → pool → 32×15×15
+        {"in_channels": 32,  "out_channels": 64,  "kernel_size": 3, "stride": 1,
+         "in_precision": 8, "out_precision": 8},     # 32×15×15 → 64×13×13 → pool → 64×6×6
+        {"in_channels": 64,  "out_channels": 128, "kernel_size": 3, "stride": 1,
+         "in_precision": 8, "out_precision": 8},     # 64×6×6   → 128×4×4  → pool → 128×2×2
+        {"in_channels": 128, "out_channels": 128, "kernel_size": 1, "stride": 1,
+         "in_precision": 8, "out_precision": 8},     # 128×2×2  → 128×2×2  → pool → 128×1×1
     ],
 
-    # Pooling (applied after each conv layer)
     "pool_size": 2,
     "pool_stride": 2,
 
-    # Kanele MLP: classify the compressed features
-    "mlp_layers": [16, 10],     # 4×2×2 = 16 → 16 → 10 classes
+    # KAN MLP: Flatten(128) → 256 → 10
+    "mlp_layers": [128,10],
     "mlp_bitwidth": [8, 8],
 
-    # shared KAN hyper-params  (grid_size=5 → 8 coeffs/edge)
+    # shared KAN hyper-params
     "grid_size": 5,
     "spline_order": 3,
     "grid_eps": 0.05,
     "grid_range": [-4, 4],
     "base_activation": "nn.SiLU",
 
-    # training — more epochs to compensate for smaller capacity
+    # training — batch=16 to fit 8GB GPU (KAN spline tensors are huge)
+    # Conv1 (32→64, K=3) peak memory: batch × 169 × 288 × 64 × 8 × 4B
+    #   batch=128 → ~12 GB (OOM!)    batch=16 → ~1.5 GB ✓
     "batch_size": 128,
-    "num_epochs": 400,
-    "learning_rate": 1e-2,
+    "num_epochs": 200,
+    "learning_rate": 1e-3,
     "weight_decay": 1e-4,
-    "scheduler_gamma": 0.997,
+    "scheduler_gamma": 0.998,
 
-    # pruning
-    "prune_threshold": 0.25,
-    "target_epoch": 30,
-    "warmup_epochs": 10,
+    # pruning (replaces Dropout)
+    "prune_threshold": 0.3,
+    "target_epoch": 25,
+    "warmup_epochs": 15,
     "random_seed": seed,
 
-    # input quantization — 4-bit gives 16 levels per pixel
-    "input_bitwidth": 4,
+    # input quantization
+    "input_bitwidth": 8,
 
     # resume
     "resume": False,
@@ -191,8 +195,8 @@ transform_test = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
 ])
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True,  download=True, transform=transform_train)
-valset   = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True,  download=False, transform=transform_train)
+valset   = torchvision.datasets.CIFAR10(root='./data', train=False, download=False, transform=transform_test)
 trainloader = DataLoader(trainset, batch_size=config['batch_size'], shuffle=True)
 valloader   = DataLoader(valset,   batch_size=config['batch_size'], shuffle=False)
 
