@@ -70,10 +70,16 @@ CKAN/
 │       ├── sim/                      #     Testbench templates
 │       └── vivado/                   #     TCL build scripts
 │
-├── experiments/ckan_mnist/           # MNIST experiment
-│   ├── train_ckan.py                 #   Training script
-│   ├── convert_ckan.py               #   Export script
-│   └── prepare_fpga_data.py          #   FPGA test data generator
+├── experiments/
+│   ├── ckan_mnist/                   # MNIST experiment
+│   │   ├── train_ckan.py             #   Training script
+│   │   ├── convert_ckan.py           #   Export script
+│   │   └── prepare_fpga_data.py      #   FPGA test data generator
+│   ├── ckan_cifar10/                 # CIFAR-10 experiment
+│   │   ├── train_ckan.py             #   Training script
+│   │   ├── convert_ckan.py           #   Export script
+│   │   └── prepare_fpga_data.py      #   FPGA test data generator
+│   └── ckan_fashion_mnist/           # Fashion-MNIST experiment
 │
 ├── [Verilog RTL modules]             # Hand-written hardware IP
 │   ├── CKAN_Model.v                  #   2-layer CKAN top module (template)
@@ -125,9 +131,9 @@ python train_ckan.py
 
 | Phase | Epochs | What Happens |
 |-------|--------|-------------|
-| **Warmup** | 1–5 | No pruning. Model learns all B-spline functions. |
-| **Pruning ramp** | 5–20 | Weak connections are progressively zeroed (sparsity increases). |
-| **Fine-tuning** | 20–200 | Stable sparsity. Accuracy converges (~98–99% on MNIST). |
+| **Warmup** | 1–15 | No pruning. Model learns all B-spline functions. |
+| **Pruning ramp** | 15–25 | Linear ramp: threshold increases gradually from 0 → `prune_threshold`. Weak connections are progressively zeroed. |
+| **Fine-tuning** | 25–200 | Full pruning threshold reached. Accuracy converges (~98–99% on MNIST). |
 
 ### 3.5 Training outputs
 
@@ -523,7 +529,9 @@ Each learned B-spline is **pre-evaluated** at all quantized input values and sto
 | `grid_size` | 15 | B-spline grid resolution |
 | `spline_order` | 3 | B-spline polynomial order |
 | `input_bitwidth` | 4 | Pixel quantization (4-bit = 16 levels) |
-| `prune_threshold` | 0.3 | Pruning strength |
+| `prune_threshold` | 0.3 | Max pruning threshold (reached at `target_epoch`) |
+| `target_epoch` | 25 | Epoch at which pruning threshold reaches its maximum |
+| `warmup_epochs` | 15 | Number of epochs with no pruning (allows spline learning) |
 | `num_epochs` | 200 | Training epochs |
 
 ---
@@ -537,7 +545,8 @@ Each learned B-spline is **pre-evaluated** at all quantized input values and sto
 | `ModuleNotFoundError: brevitas` | `pip install brevitas` |
 | `FileNotFoundError: MNIST` | Set `download=True` in `train_ckan.py` lines 223–224 |
 | `CUDA out of memory` | Reduce `batch_size` in config |
-| Low accuracy | Train longer, reduce `prune_threshold`, increase `grid_size` |
+| Low accuracy | Train longer, reduce `prune_threshold`, increase `grid_size`, or increase `warmup_epochs` |
+| Accuracy collapse after warmup | Increase `warmup_epochs` or reduce `prune_threshold`. The pruning ramp may be too aggressive. |
 
 ### Export issues
 
