@@ -110,10 +110,10 @@ config = {
     "mlp_bitwidth": [6, 6],
 
     # shared KAN hyper-params
-    "grid_size": 15,
-    "spline_order": 3,
+    "grid_size": 30,
+    "spline_order": 5,
     "grid_eps": 0.05,
-    "grid_range": [-4, 4],
+    "grid_range": [-8, 8],
     "base_activation": "nn.SiLU",
 
     # training
@@ -136,48 +136,6 @@ config = {
     "resume": False,
     "resume_path": "models/",
 }
-
-# # ── CIFAR-10 config (uncomment to use) ──
-# config = {
-#     "image_height": 32,
-#     "image_width": 32,
-#
-#     # CKAN conv: compress 3-channel 4-bit color → 16×6×6
-#     "conv_layers": [
-#         {"in_channels": 3,  "out_channels": 8,  "kernel_size": 3, "stride": 1,
-#          "in_precision": 4, "out_precision": 6},       # 3×32×32 → 8×30×30
-#         {"in_channels": 8,  "out_channels": 16, "kernel_size": 3, "stride": 2,
-#          "in_precision": 6, "out_precision": 6},        # 8×30×30 → 16×14×14
-#         {"in_channels": 16, "out_channels": 16, "kernel_size": 3, "stride": 2,
-#          "in_precision": 6, "out_precision": 6},        # 16×14×14 → 16×6×6
-#     ],
-#
-#     # Kanele MLP: classify the compressed features
-#     "mlp_layers": [576, 64, 10],    # 16×6×6 = 576 → 64 → 10 classes
-#     "mlp_bitwidth": [6, 6, 6],
-#
-#     "grid_size": 15,
-#     "spline_order": 3,
-#     "grid_eps": 0.05,
-#     "grid_range": [-4, 4],
-#     "base_activation": "nn.SiLU",
-#
-#     "batch_size": 128,
-#     "num_epochs": 300,
-#     "learning_rate": 1e-2,
-#     "weight_decay": 1e-4,
-#     "scheduler_gamma": 0.995,
-#
-#     "prune_threshold": 0.3,
-#     "target_epoch": 25,
-#     "warmup_epochs": 5,
-#     "random_seed": seed,
-#
-#     "input_bitwidth": 4,    # 4-bit: 16 levels per channel per pixel
-#
-#     "resume": False,
-#     "resume_path": "models/",
-# }
 
 # ─── Resume logic ────────────────────────────────────────────────────
 resume_checkpoint_path = None
