@@ -110,10 +110,10 @@ config = {
     "mlp_bitwidth": [6, 6],
 
     # shared KAN hyper-params
-    "grid_size": 30,
-    "spline_order": 5,
+    "grid_size": 15,
+    "spline_order": 3,
     "grid_eps": 0.05,
-    "grid_range": [-8, 8],
+    "grid_range": [-4, 4],
     "base_activation": "nn.SiLU",
 
     # training

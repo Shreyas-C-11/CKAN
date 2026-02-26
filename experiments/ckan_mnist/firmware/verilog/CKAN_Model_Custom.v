@@ -17,19 +17,19 @@ module CKAN_Model_Custom #(
     parameter L1_INPUT_CHANNELS   = 1,
     parameter L1_OUTPUT_CHANNELS  = 2,
     parameter L1_DATA_WIDTH       = 4,
-    parameter L1_VALUE_WIDTH      = 8,
+    parameter L1_VALUE_WIDTH      = 6,
     parameter L1_MEM_FILE         = "kan_lut_conv0.mem",
     // ---------------- Layer 2 Parameters ----------------
     parameter L2_KERNEL_SIZE      = 3,
     parameter L2_CONV_STRIDE      = 1,
     parameter L2_INPUT_CHANNELS   = 2,
     parameter L2_OUTPUT_CHANNELS  = 2,
-    parameter L2_DATA_WIDTH       = 8,
-    parameter L2_VALUE_WIDTH      = 8,
+    parameter L2_DATA_WIDTH       = 6,
+    parameter L2_VALUE_WIDTH      = 6,
     parameter L2_MEM_FILE         = "kan_lut_conv1.mem",
 
     // ---------------- Shared Parameters ----------------
-    parameter OUT_WIDTH        = 8,
+    parameter OUT_WIDTH        = 6,
 
     // ---------------- Shared Pool Parameters ----------------
     parameter POOL_SIZE        = 2,
@@ -46,7 +46,7 @@ module CKAN_Model_Custom #(
     parameter L2_POOL_OUT_W = 5,
     parameter L2_POOL_OUT_H = 5,
 
-    parameter FLAT_OUT_WIDTH = 400
+    parameter FLAT_OUT_WIDTH = 300
 )(
     // ---------------- I/O Ports ----------------
     input  wire                                     clock,

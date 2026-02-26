@@ -1,7 +1,7 @@
 {
   "num_layers": 2,
   "input": "28\u00d728\u00d71",
-  "output_flat_width": 400,
+  "output_flat_width": 300,
   "output_elements": 50,
   "layers": [
     {

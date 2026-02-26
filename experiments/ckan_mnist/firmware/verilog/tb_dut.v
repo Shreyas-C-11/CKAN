@@ -47,11 +47,11 @@ module tb_dut;
     reg         data_valid;
     reg  [3:0]  pixel_in;
 
-    wire [399:0] flat_out;       // 400 bits
+    wire [299:0] flat_out;       // 300 bits
     wire         flat_valid;
-    wire [15:0]  l1_pool_out;    // 2 channels × 8 bits
+    wire [11:0]  l1_pool_out;    // 2 channels × 6 bits
     wire         l1_pool_valid;
-    wire [15:0]  l2_pool_out;    // 2 channels × 8 bits
+    wire [11:0]  l2_pool_out;    // 2 channels × 6 bits
     wire         l2_pool_valid;
 
     //=====================================================
@@ -96,8 +96,8 @@ module tb_dut;
             l1_pool_count <= l1_pool_count + 1;
             $display("[%0t] L1_POOL[%0d]: ch0=%0d ch1=%0d  (expect 9, 9)",
                      $time, l1_pool_count,
-                     $signed(l1_pool_out[7:0]),
-                     $signed(l1_pool_out[15:8]));
+                     $signed(l1_pool_out[5:0]),
+                     $signed(l1_pool_out[11:6]));
         end
     end
 
@@ -113,8 +113,8 @@ module tb_dut;
             l2_pool_count <= l2_pool_count + 1;
             $display("[%0t] L2_POOL[%0d]: ch0=%0d ch1=%0d  (expect 18, 18)",
                      $time, l2_pool_count,
-                     $signed(l2_pool_out[7:0]),
-                     $signed(l2_pool_out[15:8]));
+                     $signed(l2_pool_out[5:0]),
+                     $signed(l2_pool_out[11:6]));
         end
     end
 
@@ -128,8 +128,8 @@ module tb_dut;
         else if (flat_valid) begin
             flat_count <= flat_count + 1;
             $display("[%0t] ===== FLAT_VALID #%0d =====", $time, flat_count);
-            $display("  flat_out[7:0]     = 0x%h", flat_out[7:0]);
-            $display("  flat_out[399:392] = 0x%h", flat_out[399:392]);
+            $display("  flat_out[5:0]     = 0x%h", flat_out[5:0]);
+            $display("  flat_out[299:294] = 0x%h", flat_out[299:294]);
         end
     end
 
@@ -143,7 +143,7 @@ module tb_dut;
                 $display("[%0t] ERROR: l1_pool_out contains X/Z!", $time);
                 errors = errors + 1;
             end
-            else if (l1_pool_out !== 16'h0909) begin
+            else if (l1_pool_out !== 12'h0909) begin
                 $display("[%0t] MISMATCH: l1_pool_out = 0x%h, expected 0x0909", $time, l1_pool_out);
                 errors = errors + 1;
             end
@@ -155,7 +155,7 @@ module tb_dut;
                 $display("[%0t] ERROR: l2_pool_out contains X/Z!", $time);
                 errors = errors + 1;
             end
-            else if (l2_pool_out !== 16'h1212) begin
+            else if (l2_pool_out !== 12'h1212) begin
                 $display("[%0t] MISMATCH: l2_pool_out = 0x%h, expected 0x1212", $time, l2_pool_out);
                 errors = errors + 1;
             end

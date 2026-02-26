@@ -8,7 +8,7 @@
 //   - Architecture:
 //       Layer 1: 28×28×1 → Conv 3×3 → 26×26×2 → Pool 2×2 → 13×13×2
 //       Layer 2: 13×13×2 → Conv 3×3 → 11×11×2 → Pool 2×2 → 5×5×2
-//       Flatten: 5×5×2×8b = 400-bit output vector
+//       Flatten: 5×5×2×6b = 300-bit output vector
 //=====================================================
 module CKAN_Model_DUT (
     input  wire        clock,
@@ -16,13 +16,13 @@ module CKAN_Model_DUT (
     input  wire        data_valid,
     input  wire [3:0]  pixel_in,       // 1 channel × 4 bits
 
-    output wire [399:0] flat_out,      // 5×5×2×8 = 400 bits
+    output wire [299:0] flat_out,      // 5×5×2×6 = 300 bits
     output wire         flat_valid,
 
     // Intermediate taps
-    output wire [15:0]  l1_pool_out,   // 2 channels × 8 bits
+    output wire [11:0]  l1_pool_out,   // 2 channels × 6 bits
     output wire         l1_pool_valid,
-    output wire [15:0]  l2_pool_out,   // 2 channels × 8 bits
+    output wire [11:0]  l2_pool_out,   // 2 channels × 6 bits
     output wire         l2_pool_valid
 );
 
@@ -37,7 +37,7 @@ module CKAN_Model_DUT (
         .L1_INPUT_CHANNELS   (1),
         .L1_OUTPUT_CHANNELS  (2),
         .L1_DATA_WIDTH       (4),
-        .L1_VALUE_WIDTH      (8),
+        .L1_VALUE_WIDTH      (6),
         .L1_MEM_FILE         ("kan_lut_conv0.mem"),
 
         // Layer 2
@@ -45,12 +45,12 @@ module CKAN_Model_DUT (
         .L2_CONV_STRIDE      (1),
         .L2_INPUT_CHANNELS   (2),
         .L2_OUTPUT_CHANNELS  (2),
-        .L2_DATA_WIDTH       (8),
-        .L2_VALUE_WIDTH      (8),
+        .L2_DATA_WIDTH       (6),
+        .L2_VALUE_WIDTH      (6),
         .L2_MEM_FILE         ("kan_lut_conv1.mem"),
 
         // Shared CKAN (OUT_WIDTH == VALUE_WIDTH for saturated output)
-        .OUT_WIDTH           (8),
+        .OUT_WIDTH           (6),
 
         // Shared pool
         .POOL_SIZE           (2),
