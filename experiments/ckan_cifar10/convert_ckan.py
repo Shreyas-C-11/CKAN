@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # convert_ckan.py — Convert a trained CKAN model to Verilog .mem files
 #
 # Usage:  python convert_ckan.py
