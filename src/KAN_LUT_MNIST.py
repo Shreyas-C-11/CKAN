@@ -74,7 +74,7 @@ class KAN_LUT:
         layer = self.KAN.layers[layer_index].to(self.device) 
 
         truth_table = {}
-        truth_table['acive'] = int(layer.spline_selector[out_node, in_node].item()) #Where this LUT is pruned or not
+        truth_table['active'] = int(layer.spline_selector[out_node, in_node].item()) #Where this LUT is pruned or not
         scale, bits = layer.output_quantizer.get_scale_factor_bits(self.is_cuda)
         
         #Create a tensor of the input state space for each input node
@@ -90,7 +90,7 @@ class KAN_LUT:
 
         return truth_table
 
-    def _inferece_sample(self, sample):
+    def _inference_sample(self, sample):
         """
         Evaluate the KAN for a single sample
         """
@@ -119,7 +119,7 @@ class KAN_LUT:
 
                 for in_index in range(in_features):
                     truth_table = self.truth_tables[f"{i}_{in_index}_{out_index}"]
-                    if truth_table["acive"] == 0: continue # pruned connection
+                    if truth_table["active"] == 0: continue # pruned connection
                     lookup_index = sample[in_index] if i == 0 else int(running_accumulator[in_index] + 2**(input_bit_width - 1))
                     acc_out_node += truth_table['values_int'][lookup_index]
 
@@ -160,7 +160,7 @@ class KAN_LUT:
         #Loop over each sample in the batch
         outs_int = []
         for sample_index in range(x.shape[0]):
-            outs_int.append(self._inferece_sample((x[sample_index])))
+            outs_int.append(self._inference_sample((x[sample_index])))
         outs_int = torch.stack(outs_int, dim=0)
 
         # Dequantize to floats on last layer's scale
@@ -180,7 +180,7 @@ class KAN_LUT:
         return max_err
 
     #----------FIRMWARE IMPLEMENTATION----------
-    def generate_firmware(self, adder_tree=True, clock_period: float = 5.0, n_add=2, fpga_part: str = "xcvu9p-flgb2104-2-i", latency: int = 8):
+    def generate_firmware(self, adder_tree=True, clock_period: float = 10.0, n_add=2, fpga_part: str = "xc7z020clg400-1", latency: int = 8):
         """
         Generate the firmware for the KAN LUT
         """
@@ -237,7 +237,7 @@ class KAN_LUT:
         #Loop through the layers and pick up the signals that exist
         for i, layer in enumerate(self.KAN.layers):
             in_f, out_f = layer.in_features, layer.out_features
-            acts=[f"act_{i}_{j}_{k}" for j in range(in_f) for k in range(out_f) if self.truth_tables[f"{i}_{j}_{k}"]["acive"] == 1 and i != 0]
+            acts=[f"act_{i}_{j}_{k}" for j in range(in_f) for k in range(out_f) if self.truth_tables[f"{i}_{j}_{k}"]["active"] == 1 and i != 0]
             outs=[f"out{i}_{k}" for k in range(out_f)] if i != len(self.KAN.layers)-1 else []
             outs_reg=[f"out{i}_{k}_reg" for k in range(out_f)] if i != len(self.KAN.layers)-1 else [] #Registers for the outputs
             block=[f"-- Layer {i} ({in_f}->{out_f})"]
@@ -245,7 +245,7 @@ class KAN_LUT:
                 for k in range(out_f):
                     # The sum width is now defined in the package, no need to redefine act_0_k_t here
                     # Instead, we just need the signals for the delta terms
-                    acts_0=[f"act_0_{j}_{k}" for j in range(in_f) if self.truth_tables[f"0_{j}_{k}"]["acive"] == 1]
+                    acts_0=[f"act_0_{j}_{k}" for j in range(in_f) if self.truth_tables[f"0_{j}_{k}"]["active"] == 1]
                     # Assuming SUM_WIDTH_0_k is available or can be inferred, for now using a placeholder type if needed
                     # The type `act_0_k_t` from your package is what will be used.
                     if acts_0:
@@ -256,8 +256,6 @@ class KAN_LUT:
             if not adder_tree:
                 for k in range(out_f):
                     sum_term=[f"sum_{i}_{k}"]
-                    # The sum type `sum_t_i_k` must accommodate the bias and deltas
-                    blocks.append(f"subtype  sum_t_{i}_{k} is signed({width - 1} downto 0);") # Example
                     block.append(emit(sum_term, f"sum_t_{i}_{k}"))
             sections.append("\n".join(block))
 
@@ -288,7 +286,7 @@ class KAN_LUT:
                 sum_terms_scan.extend([
                     f"resize(act_{i}_{j}_{k_scan}, SUM_WIDTH_{i}_{k_scan})" if i != 0 else f"act_{i}_{j}_{k_scan}"
                     for j in range(in_f)
-                    if self.truth_tables[f"{i}_{j}_{k_scan}"]["acive"] == 1
+                    if self.truth_tables[f"{i}_{j}_{k_scan}"]["active"] == 1
                 ])
                 # --- MODIFICATION END ---
                 
@@ -314,7 +312,7 @@ class KAN_LUT:
                 # First layer uses the delta-representation (C_i_j_k constants)
                 if i == 0:
                     for j in range(in_f):
-                        if self.truth_tables[f"{i}_{j}_{k}"]["acive"] == 0: 
+                        if self.truth_tables[f"{i}_{j}_{k}"]["active"] == 0: 
                             continue
                         dst = f"act_{i}_{j}_{k}"
                         instantiations.append(
@@ -324,7 +322,7 @@ class KAN_LUT:
                         inst_idx += 1
                 else: # Other layers use LUTs
                     for j in range(in_f):
-                        if self.truth_tables[f"{i}_{j}_{k}"]["acive"] == 0: 
+                        if self.truth_tables[f"{i}_{j}_{k}"]["active"] == 0: 
                             continue
                         mem = f"lut_{i}_{j}_{k}.mem"
                         src = f"out{i-1}_{j}_reg" # Input comes from previous layer's registered output
@@ -479,7 +477,7 @@ class KAN_LUT:
         for i, layer in enumerate(self.KAN.layers):
             for k in range(layer.out_features):
                 active_lut = sum(
-                    self.truth_tables[f"{i}_{j}_{k}"]["acive"] == 1
+                    self.truth_tables[f"{i}_{j}_{k}"]["active"] == 1
                     for j in range(layer.in_features)
                 )
                 width = layer.out_precision + ceil(log2(active_lut)) if active_lut > 0 else layer.out_precision
@@ -509,15 +507,15 @@ class KAN_LUT:
                 blocks.append(f"subtype  lut_output_t_{i} is signed({layer.out_precision - 1} downto 0);")
                 
                 for k in range(layer.out_features):
-                    active_lut = sum(self.truth_tables[f"{i}_{j}_{k}"]["acive"] == 1 for j in range(layer.in_features))
+                    active_lut = sum(self.truth_tables[f"{i}_{j}_{k}"]["active"] == 1 for j in range(layer.in_features))
                     width = layer.out_precision + ceil(log2(active_lut)) if active_lut > 0 else layer.out_precision
                     blocks.append(f"subtype  act_0_{k}_t is signed({width - 1} downto 0);")
 
-                    bias_term = sum([self.truth_tables[f"{i}_{j}_{k}"]["values_int"][0] for j in range(layer.in_features) if self.truth_tables[f"{i}_{j}_{k}"]["acive"] == 1])
+                    bias_term = sum([self.truth_tables[f"{i}_{j}_{k}"]["values_int"][0] for j in range(layer.in_features) if self.truth_tables[f"{i}_{j}_{k}"]["active"] == 1])
                     delta_definitions = [f"constant B_{i}_{k} : signed({width - 1} downto 0) := to_signed({bias_term}, {width});"]
 
                     for j in range(layer.in_features):
-                        if self.truth_tables[f"{i}_{j}_{k}"]["acive"] == 1:
+                        if self.truth_tables[f"{i}_{j}_{k}"]["active"] == 1:
                             diff_term = self.truth_tables[f"{i}_{j}_{k}"]["values_int"][1] - self.truth_tables[f"{i}_{j}_{k}"]["values_int"][0]
                             delta_definitions.append(f"constant C_{i}_{j}_{k} : signed({width - 1} downto 0) := to_signed({diff_term}, {width});")
                     
@@ -583,7 +581,7 @@ class KAN_LUT:
             for j in range(layer.in_features):
                 for k in range(layer.out_features):
                     truth_table = self.truth_tables[f"{i}_{j}_{k}"]
-                    if truth_table["acive"] == 0: continue
+                    if truth_table["active"] == 0: continue
                     mem_path = os.path.join(self.firmware_dir, "mem", f"lut_{i}_{j}_{k}.mem")
                     with open(mem_path, "w") as f:
                         f.write("\n".join([int_to_hex_word(v, layer.out_precision) for v in truth_table['values_int']]))
@@ -592,7 +590,7 @@ class KAN_LUT:
         # Small breadcrumb
         print(f"Wrote {written} LUT .mem file(s) to {self.firmware_dir}/mem/")
 
-    def write_build_tcl(self, clock_period: float, fpga_part: str = "xcvu9p-flgb2104-2-i"):
+    def write_build_tcl(self, clock_period: float, fpga_part: str = "xc7z020clg400-1"):
         
         #Open the template file
         with open(os.path.join(os.path.dirname(__file__), "templates", "vivado", "build_full.tcl"), "r") as tf: tpl_full = tf.read()
@@ -635,7 +633,7 @@ class KAN_LUT:
         # reference integer outputs via the internal integer evaluator
         outs = []
         for i in range(n_vectors):
-            outs.append(self._inferece_sample(x_q[i]))
+            outs.append(self._inference_sample(x_q[i]))
         outs = torch.stack(outs, dim=0).to(torch.int64)
 
         # Write as space-separated decimals, one vector per line

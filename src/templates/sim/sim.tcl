@@ -5,7 +5,7 @@
 # ----------------- Config -----------------
 set PROJ "KAN_SIM"
 set DIR  [file normalize [pwd]]
-set PART "xcvu9p-flgb2104-2-i"
+set PART "xc7z020clg400-1"
 
 # ----------------- Project on disk -----------------
 create_project -name $PROJ -part $PART -dir "$DIR/$PROJ" -force

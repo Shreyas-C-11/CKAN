@@ -139,7 +139,7 @@ class CKANExport:
 
         return meta
 
-    def export_mlp_firmware(self, clock_period=1.2, n_add=4, fpga_part="xcvu9p-flgb2104-2-i", latency=8):
+    def export_mlp_firmware(self, clock_period=10.0, n_add=4, fpga_part="xc7z020clg400-1", latency=8):
         """
         Export the complete MLP firmware using Kanele's KAN_LUT infrastructure.
         
