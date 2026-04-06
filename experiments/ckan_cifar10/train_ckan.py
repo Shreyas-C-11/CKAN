@@ -114,9 +114,9 @@ config = {
     "pool_size": 2,
     "pool_stride": 2,
 
-    # KAN MLP: Flatten(128) → 256 → 10
-    "mlp_layers": [128,10],
-    "mlp_bitwidth": [8, 8],
+    # KAN MLP: Flatten(128) → 64 → 10
+    "mlp_layers": [128, 64, 10],
+    "mlp_bitwidth": [6, 6, 6],
 
     # shared KAN hyper-params
     "grid_size": 5,
@@ -128,14 +128,14 @@ config = {
     # training — batch=16 to fit 8GB GPU (KAN spline tensors are huge)
     # Conv1 (32→64, K=3) peak memory: batch × 169 × 288 × 64 × 8 × 4B
     #   batch=128 → ~12 GB (OOM!)    batch=16 → ~1.5 GB ✓
-    "batch_size": 128,
+    "batch_size": 16,
     "num_epochs": 200,
     "learning_rate": 1e-3,
     "weight_decay": 1e-4,
     "scheduler_gamma": 0.998,
 
     # pruning (replaces Dropout)
-    "prune_threshold": 0.3,
+    "prune_threshold": 0.08,  # Lowered from 0.3! 128-wide layers have much smaller individual spline norms.
     "target_epoch": 25,
     "warmup_epochs": 15,
     "random_seed": seed,
@@ -144,8 +144,8 @@ config = {
     "input_bitwidth": 8,
 
     # resume
-    "resume": False,
-    "resume_path": "models/",
+    "resume": True,
+    "resume_path": "models/20260321_025732/CKAN_acc0.7253_epoch14_remaining1.0000.pt",
 }
 
 # ─── Resume logic ────────────────────────────────────────────────────
