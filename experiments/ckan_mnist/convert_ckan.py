@@ -3,13 +3,12 @@
 #
 # Usage:  python convert_ckan.py
 #
-# Generates (Approach A — unique SIC module copies per instance):
-#   firmware/mem/         → per-function .mem files (64 entries each)
+# Generates (Approach B — inline ROM values, NO .mem files):
 #   firmware/verilog/     → full optimised Verilog hierarchy
-#   firmware/verilog/vh/  → per-SIC .vh include files
 #
-# The generated Verilog uses KAN_LUT_ROM_opt (6-bit addr, pure LUT6)
-# and eliminates ALL runtime func_base_id muxing.
+# ROM data is hardcoded directly as localparam init strings inside each
+# Conv_SIC module, eliminating ALL .mem files and $readmemh calls.
+# This prevents Vivado project manager crashes from 100K+ file handles.
 
 import os, sys, json, shutil
 import torch
@@ -88,13 +87,9 @@ if 'val_accuracy' in checkpoint:
 
 # ─── Output directories ──────────────────────────────────────────────
 firmware_dir = os.path.join(model_dir, 'firmware')
-mem_dir = os.path.join(firmware_dir, 'mem')
 verilog_dir = os.path.join(firmware_dir, 'verilog')
-vh_dir = os.path.join(verilog_dir, 'vh')
 
-os.makedirs(mem_dir, exist_ok=True)
 os.makedirs(verilog_dir, exist_ok=True)
-os.makedirs(vh_dir, exist_ok=True)
 
 # ─── Export ───────────────────────────────────────────────────────────
 exporter = CKANExport(model, config, device)
@@ -119,13 +114,17 @@ def calc_pool_out_size(in_size, pool_size, pool_stride):
 
 
 # =====================================================================
-# STEP 1: Export split .mem files (one per function)
+# STEP 1: Compute LUT values for all functions (store in memory)
 # =====================================================================
 print("\n" + "=" * 60)
-print("STEP 1: Exporting split .mem files")
+print("STEP 1: Computing LUT values (inline — no .mem files)")
 print("=" * 60)
 
 layer_metas = []
+# lut_data[layer_idx][(oc, ic, pix)] = list of int values
+lut_data = {}
+
+import numpy as np
 
 with torch.inference_mode():
     for layer_idx in range(len(model.conv_layers)):
@@ -178,7 +177,7 @@ with torch.inference_mode():
         print(f"\n  Layer {layer_idx}: {cout}×{cin}×{k}×{k} = {num_functions} functions, "
               f"{num_inputs} entries each ({data_width}b→{value_width}b)")
 
-        mem_files_written = 0
+        lut_data[layer_idx] = {}
         for func_id in range(num_functions):
             out_ch = func_id // in_features
             in_idx = func_id % in_features
@@ -195,17 +194,9 @@ with torch.inference_mode():
 
             # Quantize to integer
             lut_values = (combined / scale).round().to(torch.int).tolist()
-            import numpy as np
             lut_values = np.clip(lut_values, min_state, max_state).tolist()
 
-            # Write individual .mem file
-            mem_filename = f"func_l{layer_idx}_oc{out_ch}_ic{in_ch}_pix{pix}.mem"
-            mem_path = os.path.join(mem_dir, mem_filename)
-            with open(mem_path, "w") as f:
-                for v in lut_values:
-                    f.write(int_to_hex(v, value_width) + "\n")
-
-            mem_files_written += 1
+            lut_data[layer_idx][(out_ch, in_ch, pix)] = [int(v) for v in lut_values]
 
         meta = {
             "conv_layer_idx": layer_idx,
@@ -220,12 +211,7 @@ with torch.inference_mode():
         }
         layer_metas.append(meta)
 
-        meta_path = os.path.join(mem_dir, f"conv{layer_idx}_meta.json")
-        with open(meta_path, "w") as f:
-            json.dump(meta, f, indent=2)
-
-        print(f"  → {mem_files_written} .mem files written to {mem_dir}/")
-        print(f"  → Metadata: {meta_path}")
+        print(f"  → {num_functions} LUT functions computed (inline, no .mem files)")
 
 
 # =====================================================================
@@ -274,44 +260,19 @@ flat_size = last_layer["pool_h"] * last_layer["pool_w"] * last_layer["out_channe
 flat_out_width = flat_size * out_width
 
 
-# ── 2a: Generate .vh files (per-SIC ROM instantiations) ──────────────
-print("\n  Generating .vh ROM instance files...")
-
-for layer_idx, dims in enumerate(layer_dims):
-    k = dims["kernel_size"]
-    cin = dims["in_channels"]
-    cout = dims["out_channels"]
-    N = k * k
-
-    for oc in range(cout):
-        for ic in range(cin):
-            vh_filename = f"kan_lut_instances_l{layer_idx}_oc{oc}_ic{ic}.vh"
-            vh_path = os.path.join(vh_dir, vh_filename)
-            
-            with open(vh_path, 'w') as f:
-                f.write(f"// Auto-generated: Layer {layer_idx}, OutCh {oc}, InCh {ic}\n")
-                f.write(f"// {N} ROM instances, {1 << dims['data_width']} entries each\n\n")
-                
-                for pix in range(N):
-                    mem_filename = f"func_l{layer_idx}_oc{oc}_ic{ic}_pix{pix}.mem"
-                    # Use relative path from Vivado project to mem dir
-                    f.write(
-                        f'KAN_LUT_ROM_opt #(\n'
-                        f'    .VALUE_WIDTH ({dims["value_width"]}),\n'
-                        f'    .INPUT_WIDTH ({dims["data_width"]}),\n'
-                        f'    .MEM_FILE    ("{mem_filename}")\n'
-                        f') lut_{pix} (\n'
-                        f'    .addr (px[{pix}]),\n'
-                        f'    .data (lut_out[{pix}])\n'
-                        f');\n\n'
-                    )
-            
-            print(f"    ✓ {vh_filename}")
+# ── 2a: (REMOVED — no .vh files needed, ROM data is inlined) ────────
 
 
-# ── 2b: Generate unique Conv_SIC modules (Approach A) ────────────────
-print("\n  Generating unique Conv_SIC modules (Approach A)...")
+def int_to_inithex(value, bits):
+    """Convert signed int to hex string for Verilog init."""
+    mask = (1 << bits) - 1
+    return f"{value & mask:0{(bits + 3) // 4}X}"
 
+
+# ── 2b: Generate unique Conv_SIC modules (Approach B — inline ROMs) ──
+print("\n  Generating unique Conv_SIC modules (inline ROM data)...")
+
+sic_count = 0
 for layer_idx, dims in enumerate(layer_dims):
     k = dims["kernel_size"]
     cin = dims["in_channels"]
@@ -319,11 +280,11 @@ for layer_idx, dims in enumerate(layer_dims):
     dw = dims["data_width"]
     vw = dims["value_width"]
     N = k * k
+    depth = 1 << dw
 
     for oc in range(cout):
         for ic in range(cin):
             module_name = f"Conv_SIC_l{layer_idx}_oc{oc}_ic{ic}"
-            vh_filename = f"kan_lut_instances_l{layer_idx}_oc{oc}_ic{ic}.vh"
             filepath = os.path.join(verilog_dir, f"{module_name}.v")
 
             grp_guard = max(ceil(log2(k)), 1) if k > 1 else 1
@@ -331,11 +292,19 @@ for layer_idx, dims in enumerate(layer_dims):
             final_guard = grp_guard
             acc_width = grp_width + final_guard
 
+            # Build inline ROM initialization strings for each pixel
+            rom_init_blocks = []
+            for pix in range(N):
+                values = lut_data[layer_idx].get((oc, ic, pix), [0] * depth)
+                # Build Verilog hex init string: mem[0]=val0, mem[1]=val1, ...
+                hex_pairs = [int_to_inithex(v, vw) for v in values]
+                rom_init_blocks.append(hex_pairs)
+
             with open(filepath, 'w') as f:
                 f.write(f"""//=====================================================
 // Module: {module_name}
-// Auto-generated split-ROM SIC for Layer {layer_idx}, OutCh {oc}, InCh {ic}
-// Each of the {N} ROMs has {1 << dw} entries × {vw}-bit output
+// Auto-generated SIC for Layer {layer_idx}, OutCh {oc}, InCh {ic}
+// {N} inline ROMs, {depth} entries × {vw}-bit each (NO .mem files)
 //=====================================================
 module {module_name} #(
     parameter KERNEL_SIZE = {k},
@@ -366,12 +335,23 @@ module {module_name} #(
             assign px[gi] = kernel_in[(gi+1)*DATA_WIDTH-1 -: DATA_WIDTH];
     endgenerate
 
-    // Split-ROM LUT instances (each is a tiny {1 << dw}-entry ROM)
+    // Inline ROM LUT instances (data hardcoded — no .mem files)
     wire signed [VALUE_WIDTH-1:0] lut_out [0:N-1];
 
-    `include "{vh_filename}"
+""")
+                # Emit each ROM as a reg array with initial block
+                for pix in range(N):
+                    hex_pairs = rom_init_blocks[pix]
+                    f.write(f"    // ROM for pixel {pix}\n")
+                    f.write(f"    (* rom_style = \"distributed\" *)\n")
+                    f.write(f"    reg signed [VALUE_WIDTH-1:0] rom_{pix} [0:{depth-1}];\n")
+                    f.write(f"    assign lut_out[{pix}] = rom_{pix}[px[{pix}]];\n")
+                    f.write(f"    initial begin\n")
+                    for addr, hx in enumerate(hex_pairs):
+                        f.write(f"        rom_{pix}[{addr}] = {vw}'h{hx};\n")
+                    f.write(f"    end\n\n")
 
-    // PIPELINE STAGE 1: Register LUT outputs
+                f.write(f"""    // PIPELINE STAGE 1: Register LUT outputs
     reg signed [VALUE_WIDTH-1:0] lut_r [0:N-1];
     integer j;
     always @(posedge clock) begin
@@ -442,7 +422,11 @@ module {module_name} #(
 
 endmodule
 """)
-            print(f"    ✓ {module_name}.v")
+            sic_count += 1
+            if sic_count % 500 == 0:
+                print(f"    ... {sic_count} SIC modules generated")
+
+print(f"    ✓ {sic_count} Conv_SIC modules generated (inline ROM data)")
 
 
 # ── 2c: Generate Conv_MIC_opt modules (one per layer×out_ch) ─────────
@@ -780,10 +764,10 @@ print(f"    ✓ CKAN_Model_Custom_opt.v")
 
 
 # ── 2f: Copy shared RTL modules ──────────────────────────────────────
+# NOTE: KAN_LUT_ROM_opt.v is NO LONGER needed — ROMs are inlined
 print("\n  Copying shared RTL modules...")
 rtl_root = os.path.join(os.path.dirname(__file__), '..', '..')
 shared_modules = [
-    "KAN_LUT_ROM_opt.v",
     "ImageBufferChnl.v",
     "ImageBuf_KernelSlider.v",
     "Line_Buffer.v",
@@ -865,23 +849,20 @@ with torch.inference_mode():
 print("\n" + "=" * 60)
 print("✓ ALL FIRMWARE GENERATED")
 print("=" * 60)
-print(f"  Split .mem files:  {mem_dir}/")
 print(f"  Optimised Verilog: {verilog_dir}/")
-print(f"  .vh ROM instances: {vh_dir}/")
 print(f"  MLP VHDL:          {mlp_fw_dir}/")
 print(f"")
-print(f"  Total ROMs:        {total_roms}")
+print(f"  Total ROMs:        {total_roms} (values hardcoded in Verilog)")
 print(f"  Estimated LUT6:    {total_lut6} (ROM only)")
 print(f"  Flat output:       {flat_out_width} bits")
 print(f"")
-print(f"  Architecture: Split-ROM Approach A")
-print(f"  → Each SIC module is a unique Verilog module")
-print(f"  → NO runtime func_base_id anywhere")
-print(f"  → Each LUT6 stores one output bit of one function")
+print(f"  Architecture: Inline ROM (NO .mem files, NO .vh files)")
+print(f"  → ROM data is hardcoded inside each Conv_SIC module")
+print(f"  → NO $readmemh calls — Vivado won't crash")
+print(f"  → Pruned (all-zero) ROMs will be optimized away by synthesis")
 print(f"")
 print(f"Next steps:")
-print(f"  1. Copy Verilog + .mem + .vh to your Vivado project")
+print(f"  1. Copy verilog/ folder to your Vivado project")
 print(f"  2. Add all .v files to the sources")
-print(f"  3. Set .vh and .mem search paths in Vivado")
-print(f"  4. Wire CKAN_Model_Custom_opt.flat_out → MLP KAN.vhd input")
-print(f"  5. Synthesize!")
+print(f"  3. Wire CKAN_Model_Custom_opt.flat_out → MLP KAN.vhd input")
+print(f"  4. Synthesize!")
