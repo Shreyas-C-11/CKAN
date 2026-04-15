@@ -16,7 +16,15 @@ import json
 import os
 
 def load_test_data(data_dir="fpga_test_data", num_images=100):
-    """Load pre-generated hex pixel streams and labels."""
+    """Load pre-generated npy test arrays when available, otherwise hex streams."""
+    x_test_path = os.path.join(data_dir, "x_test.npy")
+    y_test_path = os.path.join(data_dir, "y_test.npy")
+
+    if os.path.isfile(x_test_path) and os.path.isfile(y_test_path):
+        images = np.load(x_test_path, allow_pickle=False)
+        labels = np.load(y_test_path, allow_pickle=False)
+        return list(images[:num_images]), list(labels[:num_images])
+
     labels = []
     images = []
     
@@ -52,7 +60,7 @@ def benchmark_dma(overlay, images, labels, num_runs=3):
     
     # Warmup (5 images)
     for i in range(min(5, num_images)):
-        input_buffer[:] = images[i]
+        input_buffer[:] = np.asarray(images[i]).reshape(-1)
         dma.sendchannel.transfer(input_buffer)
         dma.recvchannel.transfer(output_buffer)
         dma.sendchannel.wait()
@@ -68,7 +76,7 @@ def benchmark_dma(overlay, images, labels, num_runs=3):
         run_start = time.perf_counter()
         
         for i in range(num_images):
-            input_buffer[:] = images[i]
+            input_buffer[:] = np.asarray(images[i]).reshape(-1)
             
             t0 = time.perf_counter()
             dma.sendchannel.transfer(input_buffer)
@@ -124,7 +132,7 @@ def benchmark_mmio(overlay, images, labels, num_runs=3):
             ip.write(CTRL_REG, 0x1)  # release reset
             
             # Stream pixels one by one
-            for pixel in images[i]:
+            for pixel in np.asarray(images[i]).reshape(-1):
                 ip.write(DATA_IN_REG, int(pixel))
             
             # Wait for done

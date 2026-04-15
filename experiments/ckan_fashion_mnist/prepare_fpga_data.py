@@ -82,6 +82,7 @@ def main():
     os.makedirs(pixel_dir, exist_ok=True)
 
     labels = []
+    x_test = []
     for idx in range(num_images):
         image, label = testset[idx]  # image: [1, 28, 28] float tensor
         labels.append(label)
@@ -90,6 +91,7 @@ def main():
         # The FPGA input layer handles quantization in hardware
         raw_pixels = (image[0] * 0.3530 + 0.2860) * 255.0  # undo normalization
         raw_pixels = raw_pixels.clamp(0, 255).to(torch.uint8)
+        x_test.append(raw_pixels.cpu().numpy())
 
         # Write row-major pixel stream (one hex byte per line)
         hex_path = os.path.join(pixel_dir, f"image_{idx:04d}_label{label}.hex")
@@ -105,6 +107,13 @@ def main():
             f.write(f"{lbl}\n")
     print(f"  ✓ {num_images} pixel streams → {pixel_dir}/")
     print(f"  ✓ Labels → {label_path}")
+
+    x_test_path = os.path.join(args.output_dir, "x_test.npy")
+    y_test_path = os.path.join(args.output_dir, "y_test.npy")
+    np.save(x_test_path, np.stack(x_test, axis=0))
+    np.save(y_test_path, np.array(labels, dtype=np.int64))
+    print(f"  ✓ X test data → {x_test_path}")
+    print(f"  ✓ Y test data → {y_test_path}")
 
     # Also write a single combined file (all images concatenated)
     combined_path = os.path.join(args.output_dir, "all_pixels.hex")
@@ -257,6 +266,8 @@ def _write_summary(output_dir, num_images, labels, has_mlp_vectors=False,
         "pixel_streams/image_NNNN_labelL.hex": "Individual 28x28 pixel streams (raw 8-bit)",
         "all_pixels.hex": "All images concatenated (with // comments)",
         "test_labels.txt": "Ground-truth labels (one per line)",
+        "x_test.npy": "Test images as uint8 arrays for deployment.ipynb",
+        "y_test.npy": "Test labels as int64 array for deployment.ipynb",
     }
     if has_mlp_vectors:
         summary["files"].update({
