@@ -106,7 +106,7 @@ config = {
 
     # Kanele MLP: classify the compressed features
     "mlp_layers": [50, 10],     # 2×5×5 = 50 → 10 classes
-    "mlp_bitwidth": [8, 8],
+    "mlp_bitwidth": [6, 6],
 
     # shared KAN hyper-params
     "grid_size": 15,

@@ -215,10 +215,10 @@ with torch.inference_mode():
 
 
 # =====================================================================
-# STEP 2: Generate optimised Verilog (Approach A — unique SIC copies)
+# STEP 2: Generate optimised Verilog (MIC-only — no separate SIC files)
 # =====================================================================
 print("\n" + "=" * 60)
-print("STEP 2: Generating optimised Verilog (Approach A)")
+print("STEP 2: Generating optimised Verilog (MIC-only architecture)")
 print("=" * 60)
 
 conv_layers = config["conv_layers"]
@@ -269,10 +269,16 @@ def int_to_inithex(value, bits):
     return f"{value & mask:0{(bits + 3) // 4}X}"
 
 
-# ── 2b: Generate unique Conv_SIC modules (Approach B — inline ROMs) ──
-print("\n  Generating unique Conv_SIC modules (inline ROM data)...")
+# ── 2b: (REMOVED — SIC logic is now inlined inside MIC modules) ─────
+# NOTE: No separate Conv_SIC_*.v files are generated.  All ROM data and
+# per-channel accumulation logic is embedded directly inside each
+# Conv_MIC module, reducing ~27 000 files to ~360 for CIFAR-10.
 
-sic_count = 0
+
+# ── 2c: Generate Conv_MIC modules (SIC logic inlined) ────────────────
+print("\n  Generating Conv_MIC modules (SIC logic inlined)...")
+
+mic_count = 0
 for layer_idx, dims in enumerate(layer_dims):
     k = dims["kernel_size"]
     cin = dims["in_channels"]
@@ -282,175 +288,23 @@ for layer_idx, dims in enumerate(layer_dims):
     N = k * k
     depth = 1 << dw
 
-    for oc in range(cout):
-        for ic in range(cin):
-            module_name = f"Conv_SIC_l{layer_idx}_oc{oc}_ic{ic}"
-            filepath = os.path.join(verilog_dir, f"{module_name}.v")
-
-            grp_guard = max(ceil(log2(k)), 1) if k > 1 else 1
-            grp_width = vw + grp_guard
-            final_guard = grp_guard
-            acc_width = grp_width + final_guard
-
-            # Build inline ROM initialization strings for each pixel
-            rom_init_blocks = []
-            for pix in range(N):
-                values = lut_data[layer_idx].get((oc, ic, pix), [0] * depth)
-                # Build Verilog hex init string: mem[0]=val0, mem[1]=val1, ...
-                hex_pairs = [int_to_inithex(v, vw) for v in values]
-                rom_init_blocks.append(hex_pairs)
-
-            with open(filepath, 'w') as f:
-                f.write(f"""//=====================================================
-// Module: {module_name}
-// Auto-generated SIC for Layer {layer_idx}, OutCh {oc}, InCh {ic}
-// {N} inline ROMs, {depth} entries × {vw}-bit each (NO .mem files)
-//=====================================================
-module {module_name} #(
-    parameter KERNEL_SIZE = {k},
-    parameter DATA_WIDTH  = {dw},
-    parameter VALUE_WIDTH = {vw},
-    parameter OUT_WIDTH   = {out_width}
-)(
-    input  wire clock,
-    input  wire sreset_n,
-    input  wire data_valid,
-    input  wire [KERNEL_SIZE*KERNEL_SIZE*DATA_WIDTH-1:0] kernel_in,
-    output reg  signed [OUT_WIDTH-1:0] conv_out,
-    output reg                         conv_valid
-);
-
-    localparam N = KERNEL_SIZE * KERNEL_SIZE;
-    localparam K = KERNEL_SIZE;
-    localparam GRP_GUARD = {grp_guard};
-    localparam GRP_WIDTH = VALUE_WIDTH + GRP_GUARD;
-    localparam FINAL_GUARD = {final_guard};
-    localparam ACC_WIDTH = GRP_WIDTH + FINAL_GUARD;
-
-    // Unpack pixels
-    wire [DATA_WIDTH-1:0] px [0:N-1];
-    genvar gi;
-    generate
-        for (gi = 0; gi < N; gi = gi + 1)
-            assign px[gi] = kernel_in[(gi+1)*DATA_WIDTH-1 -: DATA_WIDTH];
-    endgenerate
-
-    // Inline ROM LUT instances (data hardcoded — no .mem files)
-    wire signed [VALUE_WIDTH-1:0] lut_out [0:N-1];
-
-""")
-                # Emit each ROM as a reg array with initial block
-                for pix in range(N):
-                    hex_pairs = rom_init_blocks[pix]
-                    f.write(f"    // ROM for pixel {pix}\n")
-                    f.write(f"    (* rom_style = \"distributed\" *)\n")
-                    f.write(f"    reg signed [VALUE_WIDTH-1:0] rom_{pix} [0:{depth-1}];\n")
-                    f.write(f"    assign lut_out[{pix}] = rom_{pix}[px[{pix}]];\n")
-                    f.write(f"    initial begin\n")
-                    for addr, hx in enumerate(hex_pairs):
-                        f.write(f"        rom_{pix}[{addr}] = {vw}'h{hx};\n")
-                    f.write(f"    end\n\n")
-
-                f.write(f"""    // PIPELINE STAGE 1: Register LUT outputs
-    reg signed [VALUE_WIDTH-1:0] lut_r [0:N-1];
-    integer j;
-    always @(posedge clock) begin
-        if (!sreset_n)
-            for (j = 0; j < N; j = j + 1)   lut_r[j] <= 0;
-        else if (data_valid)
-            for (j = 0; j < N; j = j + 1)   lut_r[j] <= lut_out[j];
-    end
-
-    // Group partial sums (COMBINATIONAL)
-    reg signed [GRP_WIDTH-1:0] group_sum_comb [0:K-1];
-    integer g, p;
-    always @(*) begin
-        for (g = 0; g < K; g = g + 1) begin
-            group_sum_comb[g] = {{GRP_WIDTH{{1'b0}}}};
-            for (p = 0; p < K; p = p + 1)
-                group_sum_comb[g] = group_sum_comb[g] +
-                    {{{{GRP_GUARD{{lut_r[g*K + p][VALUE_WIDTH-1]}}}}, lut_r[g*K + p]}};
-        end
-    end
-
-    // PIPELINE STAGE 2: Register group sums
-    reg signed [GRP_WIDTH-1:0] group_sum_r [0:K-1];
-    always @(posedge clock) begin
-        if (!sreset_n)
-            for (g = 0; g < K; g = g + 1)   group_sum_r[g] <= 0;
-        else
-            for (g = 0; g < K; g = g + 1)   group_sum_r[g] <= group_sum_comb[g];
-    end
-
-    // Final sum (COMBINATIONAL)
-    reg signed [ACC_WIDTH-1:0] final_sum;
-    always @(*) begin
-        final_sum = {{ACC_WIDTH{{1'b0}}}};
-        for (g = 0; g < K; g = g + 1)
-            final_sum = final_sum +
-                {{{{FINAL_GUARD{{group_sum_r[g][GRP_WIDTH-1]}}}}, group_sum_r[g]}};
-    end
-
-    // Saturator
-    localparam signed [ACC_WIDTH-1:0] SAT_MAX =
-        {{{{(ACC_WIDTH-OUT_WIDTH+1){{1'b0}}}}, {{(OUT_WIDTH-1){{1'b1}}}}}};
-    localparam signed [ACC_WIDTH-1:0] SAT_MIN =
-        {{{{(ACC_WIDTH-OUT_WIDTH+1){{1'b1}}}}, {{(OUT_WIDTH-1){{1'b0}}}}}};
-
-    wire signed [OUT_WIDTH-1:0] saturated;
-    assign saturated = (final_sum > SAT_MAX) ? SAT_MAX[OUT_WIDTH-1:0] :
-                       (final_sum < SAT_MIN) ? SAT_MIN[OUT_WIDTH-1:0] :
-                       final_sum[OUT_WIDTH-1:0];
-
-    // PIPELINE STAGE 3: Register output
-    always @(posedge clock) begin
-        if (!sreset_n)  conv_out <= 0;
-        else            conv_out <= saturated;
-    end
-
-    // Valid pipeline (3 stages to match data path)
-    reg [1:0] vpipe;
-    always @(posedge clock) begin
-        if (!sreset_n) begin
-            vpipe      <= 2'b00;
-            conv_valid <= 1'b0;
-        end else begin
-            vpipe      <= {{vpipe[0], data_valid}};
-            conv_valid <= vpipe[1];
-        end
-    end
-
-endmodule
-""")
-            sic_count += 1
-            if sic_count % 500 == 0:
-                print(f"    ... {sic_count} SIC modules generated")
-
-print(f"    ✓ {sic_count} Conv_SIC modules generated (inline ROM data)")
-
-
-# ── 2c: Generate Conv_MIC_opt modules (one per layer×out_ch) ─────────
-print("\n  Generating Conv_MIC_opt modules...")
-
-for layer_idx, dims in enumerate(layer_dims):
-    k = dims["kernel_size"]
-    cin = dims["in_channels"]
-    cout = dims["out_channels"]
-    dw = dims["data_width"]
-    vw = dims["value_width"]
-    N = k * k
+    grp_guard = max(ceil(log2(k)), 1) if k > 1 else 1
+    grp_width = vw + grp_guard
+    final_guard = grp_guard
+    acc_width = grp_width + final_guard
+    mic_acc_bits = max(ceil(log2(cin)), 1) if cin > 1 else 1
 
     for oc in range(cout):
         module_name = f"Conv_MIC_l{layer_idx}_oc{oc}"
         filepath = os.path.join(verilog_dir, f"{module_name}.v")
 
-        mic_acc_bits = max(ceil(log2(cin)), 1) if cin > 1 else 1
-
         with open(filepath, 'w') as f:
             f.write(f"""//=====================================================
 // Module: {module_name}
 // Auto-generated MIC for Layer {layer_idx}, OutCh {oc}
-// {cin} SIC instances (one per input channel)
+// {cin} input channels with inlined SIC logic
+// {cin * N} inline ROMs, {depth} entries × {vw}-bit each
+// (NO separate SIC files — all logic embedded here)
 //=====================================================
 module {module_name} #(
     parameter KERNEL_SIZE     = {k},
@@ -468,47 +322,110 @@ module {module_name} #(
 );
 
     localparam N = KERNEL_SIZE * KERNEL_SIZE;
-    wire signed [OUT_WIDTH-1:0] ch_out [0:{cin-1}];
-    wire                        ch_valid [0:{cin-1}];
-
-""")
-            # Instantiate unique SIC modules per input channel
-            for ic in range(cin):
-                sic_name = f"Conv_SIC_l{layer_idx}_oc{oc}_ic{ic}"
-                f.write(f"""    {sic_name} #(
-        .KERNEL_SIZE (KERNEL_SIZE),
-        .DATA_WIDTH  (DATA_WIDTH),
-        .VALUE_WIDTH (VALUE_WIDTH),
-        .OUT_WIDTH   (OUT_WIDTH)
-    ) sic_{ic} (
-        .clock      (clock),
-        .sreset_n   (sreset_n),
-        .data_valid (data_valid),
-        .kernel_in  (kernel_in[({ic}+1)*KERNEL_SIZE*KERNEL_SIZE*DATA_WIDTH-1 -:
-                                KERNEL_SIZE*KERNEL_SIZE*DATA_WIDTH]),
-        .conv_out   (ch_out[{ic}]),
-        .conv_valid (ch_valid[{ic}])
-    );
-
-""")
-
-            # Cross-channel accumulation
-            f.write(f"""    // Cross-channel accumulation
+    localparam K = KERNEL_SIZE;
+    localparam GRP_GUARD = {grp_guard};
+    localparam GRP_WIDTH = VALUE_WIDTH + GRP_GUARD;
+    localparam FINAL_GUARD = {final_guard};
+    localparam SIC_ACC_WIDTH = GRP_WIDTH + FINAL_GUARD;
     localparam MIC_ACC_BITS = {mic_acc_bits};
     localparam MIC_ACC_WIDTH = OUT_WIDTH + MIC_ACC_BITS;
 
-    reg signed [MIC_ACC_WIDTH-1:0] sum_wide;
-    integer j;
-    always @(*) begin
-        sum_wide = 0;
 """)
+            # ─── Per-channel SIC logic (inlined) ─────────────
+            for ic in range(cin):
+                # Unpack pixels for this input channel
+                f.write(f"    // ─── Input Channel {ic}: SIC logic ───────────────────\n")
+                f.write(f"    wire [DATA_WIDTH-1:0] ic{ic}_px [0:N-1];\n")
+                f.write(f"    genvar gi_{ic};\n")
+                f.write(f"    generate\n")
+                f.write(f"        for (gi_{ic} = 0; gi_{ic} < N; gi_{ic} = gi_{ic} + 1)\n")
+                f.write(f"            assign ic{ic}_px[gi_{ic}] = kernel_in[{ic}*N*DATA_WIDTH + (gi_{ic}+1)*DATA_WIDTH-1 -: DATA_WIDTH];\n")
+                f.write(f"    endgenerate\n\n")
+
+                # Inline ROM LUTs
+                f.write(f"    wire signed [VALUE_WIDTH-1:0] ic{ic}_lut_out [0:N-1];\n\n")
+
+                for pix in range(N):
+                    values = lut_data[layer_idx].get((oc, ic, pix), [0] * depth)
+                    hex_pairs = [int_to_inithex(v, vw) for v in values]
+
+                    f.write(f"    (* rom_style = \"distributed\" *)\n")
+                    f.write(f"    reg signed [VALUE_WIDTH-1:0] ic{ic}_rom_{pix} [0:{depth-1}];\n")
+                    f.write(f"    assign ic{ic}_lut_out[{pix}] = ic{ic}_rom_{pix}[ic{ic}_px[{pix}]];\n")
+                    f.write(f"    initial begin\n")
+                    for addr, hx in enumerate(hex_pairs):
+                        f.write(f"        ic{ic}_rom_{pix}[{addr}] = {vw}'h{hx};\n")
+                    f.write(f"    end\n\n")
+
+                # Pipeline stage 1: register LUT outputs
+                f.write(f"    reg signed [VALUE_WIDTH-1:0] ic{ic}_lut_r [0:N-1];\n")
+                f.write(f"    integer ic{ic}_j;\n")
+                f.write(f"    always @(posedge clock) begin\n")
+                f.write(f"        if (!sreset_n)\n")
+                f.write(f"            for (ic{ic}_j = 0; ic{ic}_j < N; ic{ic}_j = ic{ic}_j + 1)  ic{ic}_lut_r[ic{ic}_j] <= 0;\n")
+                f.write(f"        else if (data_valid)\n")
+                f.write(f"            for (ic{ic}_j = 0; ic{ic}_j < N; ic{ic}_j = ic{ic}_j + 1)  ic{ic}_lut_r[ic{ic}_j] <= ic{ic}_lut_out[ic{ic}_j];\n")
+                f.write(f"    end\n\n")
+
+                # Group partial sums (combinational)
+                f.write(f"    reg signed [GRP_WIDTH-1:0] ic{ic}_group_sum [0:K-1];\n")
+                f.write(f"    integer ic{ic}_g, ic{ic}_p;\n")
+                f.write(f"    always @(*) begin\n")
+                f.write(f"        for (ic{ic}_g = 0; ic{ic}_g < K; ic{ic}_g = ic{ic}_g + 1) begin\n")
+                f.write(f"            ic{ic}_group_sum[ic{ic}_g] = {{GRP_WIDTH{{1'b0}}}};\n")
+                f.write(f"            for (ic{ic}_p = 0; ic{ic}_p < K; ic{ic}_p = ic{ic}_p + 1)\n")
+                f.write(f"                ic{ic}_group_sum[ic{ic}_g] = ic{ic}_group_sum[ic{ic}_g] +\n")
+                f.write(f"                    {{{{GRP_GUARD{{ic{ic}_lut_r[ic{ic}_g*K + ic{ic}_p][VALUE_WIDTH-1]}}}}, ic{ic}_lut_r[ic{ic}_g*K + ic{ic}_p]}};\n")
+                f.write(f"        end\n")
+                f.write(f"    end\n\n")
+
+                # Pipeline stage 2: register group sums
+                f.write(f"    reg signed [GRP_WIDTH-1:0] ic{ic}_group_r [0:K-1];\n")
+                f.write(f"    always @(posedge clock) begin\n")
+                f.write(f"        if (!sreset_n)\n")
+                f.write(f"            for (ic{ic}_g = 0; ic{ic}_g < K; ic{ic}_g = ic{ic}_g + 1)  ic{ic}_group_r[ic{ic}_g] <= 0;\n")
+                f.write(f"        else\n")
+                f.write(f"            for (ic{ic}_g = 0; ic{ic}_g < K; ic{ic}_g = ic{ic}_g + 1)  ic{ic}_group_r[ic{ic}_g] <= ic{ic}_group_sum[ic{ic}_g];\n")
+                f.write(f"    end\n\n")
+
+                # Final sum per channel (combinational)
+                f.write(f"    reg signed [SIC_ACC_WIDTH-1:0] ic{ic}_final_sum;\n")
+                f.write(f"    always @(*) begin\n")
+                f.write(f"        ic{ic}_final_sum = {{SIC_ACC_WIDTH{{1'b0}}}};\n")
+                f.write(f"        for (ic{ic}_g = 0; ic{ic}_g < K; ic{ic}_g = ic{ic}_g + 1)\n")
+                f.write(f"            ic{ic}_final_sum = ic{ic}_final_sum +\n")
+                f.write(f"                {{{{FINAL_GUARD{{ic{ic}_group_r[ic{ic}_g][GRP_WIDTH-1]}}}}, ic{ic}_group_r[ic{ic}_g]}};\n")
+                f.write(f"    end\n\n")
+
+                # Saturate SIC output
+                f.write(f"    localparam signed [SIC_ACC_WIDTH-1:0] SIC_SAT_MAX_{ic} =\n")
+                f.write(f"        {{{{(SIC_ACC_WIDTH-OUT_WIDTH+1){{1'b0}}}}, {{(OUT_WIDTH-1){{1'b1}}}}}};\n")
+                f.write(f"    localparam signed [SIC_ACC_WIDTH-1:0] SIC_SAT_MIN_{ic} =\n")
+                f.write(f"        {{{{(SIC_ACC_WIDTH-OUT_WIDTH+1){{1'b1}}}}, {{(OUT_WIDTH-1){{1'b0}}}}}};\n\n")
+
+                f.write(f"    wire signed [OUT_WIDTH-1:0] ic{ic}_sat;\n")
+                f.write(f"    assign ic{ic}_sat = (ic{ic}_final_sum > SIC_SAT_MAX_{ic}) ? SIC_SAT_MAX_{ic}[OUT_WIDTH-1:0] :\n")
+                f.write(f"                        (ic{ic}_final_sum < SIC_SAT_MIN_{ic}) ? SIC_SAT_MIN_{ic}[OUT_WIDTH-1:0] :\n")
+                f.write(f"                        ic{ic}_final_sum[OUT_WIDTH-1:0];\n\n")
+
+                # Pipeline stage 3: register SIC output
+                f.write(f"    reg signed [OUT_WIDTH-1:0] ic{ic}_out_r;\n")
+                f.write(f"    always @(posedge clock) begin\n")
+                f.write(f"        if (!sreset_n)  ic{ic}_out_r <= 0;\n")
+                f.write(f"        else             ic{ic}_out_r <= ic{ic}_sat;\n")
+                f.write(f"    end\n\n")
+
+            # ─── Cross-channel MIC accumulation ──────────────
+            f.write(f"    // ─── Cross-channel accumulation ────────────────────\n")
+            f.write(f"    reg signed [MIC_ACC_WIDTH-1:0] sum_wide;\n")
+            f.write(f"    always @(*) begin\n")
+            f.write(f"        sum_wide = 0;\n")
             for ic in range(cin):
                 f.write(f"        sum_wide = sum_wide + "
-                        f"{{{{MIC_ACC_BITS{{ch_out[{ic}][OUT_WIDTH-1]}}}}, ch_out[{ic}]}};\n")
+                        f"{{{{MIC_ACC_BITS{{ic{ic}_out_r[OUT_WIDTH-1]}}}}, ic{ic}_out_r}};\n")
+            f.write(f"    end\n\n")
 
-            f.write(f"""    end
-
-    localparam signed [MIC_ACC_WIDTH-1:0] MIC_SAT_MAX =
+            f.write(f"""    localparam signed [MIC_ACC_WIDTH-1:0] MIC_SAT_MAX =
         {{{{(MIC_ACC_BITS+1){{1'b0}}}}, {{(OUT_WIDTH-1){{1'b1}}}}}};
     localparam signed [MIC_ACC_WIDTH-1:0] MIC_SAT_MIN =
         {{{{(MIC_ACC_BITS+1){{1'b1}}}}, {{(OUT_WIDTH-1){{1'b0}}}}}};
@@ -519,11 +436,30 @@ module {module_name} #(
                      sum_wide[OUT_WIDTH-1:0];
 
     assign conv_out = sum_sat;
-    assign conv_valid = ch_valid[0];
+
+""")
+            # Valid pipeline (3 stages to match data path)
+            f.write(f"""    // Valid pipeline (3 stages to match SIC data path)
+    reg [1:0] vpipe;
+    reg       conv_valid_r;
+    always @(posedge clock) begin
+        if (!sreset_n) begin
+            vpipe       <= 2'b00;
+            conv_valid_r <= 1'b0;
+        end else begin
+            vpipe       <= {{vpipe[0], data_valid}};
+            conv_valid_r <= vpipe[1];
+        end
+    end
+    assign conv_valid = conv_valid_r;
 
 endmodule
 """)
-        print(f"    ✓ {module_name}.v")
+        mic_count += 1
+        if mic_count % 50 == 0:
+            print(f"    ... {mic_count} MIC modules generated")
+
+print(f"    ✓ {mic_count} Conv_MIC modules generated (SIC logic inlined)")
 
 
 # ── 2d: Generate ConvolChnl_opt modules (one per layer) ──────────────
@@ -787,8 +723,8 @@ for mod in shared_modules:
 
 # ── 2g: Write file manifest ──────────────────────────────────────────
 manifest = {
-    "architecture": "split_rom_approach_a",
-    "description": "Optimised CKAN with per-function split ROMs (no runtime func_base_id)",
+    "architecture": "mic_inlined_rom",
+    "description": "Optimised CKAN with inline ROMs inside MIC modules (no separate SIC files)",
     "config": config,
     "layers": [],
 }
@@ -812,12 +748,14 @@ for i, dims in enumerate(layer_dims):
         "input": f"{dims['in_h']}×{dims['in_w']}×{cin}",
         "output_conv": f"{dims['conv_h']}×{dims['conv_w']}×{cout}",
         "output_pool": f"{dims['pool_h']}×{dims['pool_w']}×{cout}",
+        "mic_files": cout,
         "rom_count": n_roms,
         "rom_depth": 1 << dw,
         "rom_width": vw,
         "estimated_lut6": n_lut6,
     })
 
+manifest["total_mic_files"] = mic_count
 manifest["total_roms"] = total_roms
 manifest["total_lut6_rom_only"] = total_lut6
 manifest["flat_output_bits"] = flat_out_width
@@ -852,13 +790,17 @@ print("=" * 60)
 print(f"  Optimised Verilog: {verilog_dir}/")
 print(f"  MLP VHDL:          {mlp_fw_dir}/")
 print(f"")
+print(f"  MIC modules:       {mic_count} (SIC logic inlined inside MIC)")
+print(f"  ConvolChnl modules: {num_layers}")
+print(f"  Total .v files:    ~{mic_count + num_layers + 1 + 7} (vs ~{total_roms // (conv_layers[0]['kernel_size']**2) + mic_count + num_layers + 1 + 7} with separate SIC)")
 print(f"  Total ROMs:        {total_roms} (values hardcoded in Verilog)")
 print(f"  Estimated LUT6:    {total_lut6} (ROM only)")
 print(f"  Flat output:       {flat_out_width} bits")
 print(f"")
-print(f"  Architecture: Inline ROM (NO .mem files, NO .vh files)")
-print(f"  → ROM data is hardcoded inside each Conv_SIC module")
-print(f"  → NO $readmemh calls — Vivado won't crash")
+print(f"  Architecture: MIC-only (NO separate SIC files, NO .mem files)")
+print(f"  → ROM data is hardcoded inside each Conv_MIC module")
+print(f"  → NO separate Conv_SIC_*.v files — Vivado won't crash")
+print(f"  → NO $readmemh calls")
 print(f"  → Pruned (all-zero) ROMs will be optimized away by synthesis")
 print(f"")
 print(f"Next steps:")

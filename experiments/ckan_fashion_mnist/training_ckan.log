@@ -498,3 +498,503 @@
 2026-02-25 09:21:32,732 - INFO - Checkpoint saved: models/20260224_212412/CKAN_acc0.8604_epoch249_remaining0.7545.pt
 2026-02-25 09:24:23,595 - INFO - Epoch 250 | Val Loss: 0.3921 | Val Acc: 0.8604 | Remaining: 0.7545
 2026-02-25 09:24:23,605 - INFO - Checkpoint saved: models/20260224_212412/CKAN_acc0.8604_epoch250_remaining0.7545.pt
+2026-04-21 19:00:04,829 - INFO - Epoch 001 | Val Loss: 0.5668 | Val Acc: 0.7901 | Remaining: 1.0000
+2026-04-21 19:00:04,852 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.7901_epoch1_remaining1.0000.pt
+2026-04-21 19:00:43,679 - INFO - Epoch 002 | Val Loss: 0.5080 | Val Acc: 0.8142 | Remaining: 1.0000
+2026-04-21 19:00:43,686 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8142_epoch2_remaining1.0000.pt
+2026-04-21 19:01:21,387 - INFO - Epoch 003 | Val Loss: 0.4881 | Val Acc: 0.8245 | Remaining: 1.0000
+2026-04-21 19:01:21,393 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8245_epoch3_remaining1.0000.pt
+2026-04-21 19:01:58,429 - INFO - Epoch 004 | Val Loss: 0.4905 | Val Acc: 0.8180 | Remaining: 1.0000
+2026-04-21 19:01:58,434 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8180_epoch4_remaining1.0000.pt
+2026-04-21 19:02:36,348 - INFO - Epoch 005 | Val Loss: 0.4710 | Val Acc: 0.8313 | Remaining: 1.0000
+2026-04-21 19:02:36,353 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8313_epoch5_remaining1.0000.pt
+2026-04-21 19:03:13,315 - INFO - Epoch 006 | Val Loss: 0.4447 | Val Acc: 0.8391 | Remaining: 1.0000
+2026-04-21 19:03:13,322 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8391_epoch6_remaining1.0000.pt
+2026-04-21 19:03:52,292 - INFO - Epoch 007 | Val Loss: 0.4608 | Val Acc: 0.8339 | Remaining: 0.9477
+2026-04-21 19:03:52,307 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8339_epoch7_remaining0.9477.pt
+2026-04-21 19:04:30,535 - INFO - Epoch 008 | Val Loss: 0.4586 | Val Acc: 0.8325 | Remaining: 0.9188
+2026-04-21 19:04:30,541 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8325_epoch8_remaining0.9188.pt
+2026-04-21 19:05:06,702 - INFO - Epoch 009 | Val Loss: 0.4937 | Val Acc: 0.8161 | Remaining: 0.8736
+2026-04-21 19:05:06,709 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8161_epoch9_remaining0.8736.pt
+2026-04-21 19:05:43,715 - INFO - Epoch 010 | Val Loss: 0.5287 | Val Acc: 0.8023 | Remaining: 0.8484
+2026-04-21 19:05:43,721 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8023_epoch10_remaining0.8484.pt
+2026-04-21 19:06:21,524 - INFO - Epoch 011 | Val Loss: 0.4602 | Val Acc: 0.8313 | Remaining: 0.8213
+2026-04-21 19:06:21,530 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8313_epoch11_remaining0.8213.pt
+2026-04-21 19:07:00,830 - INFO - Epoch 012 | Val Loss: 0.4425 | Val Acc: 0.8404 | Remaining: 0.8051
+2026-04-21 19:07:00,837 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8404_epoch12_remaining0.8051.pt
+2026-04-21 19:07:38,965 - INFO - Epoch 013 | Val Loss: 0.5035 | Val Acc: 0.8164 | Remaining: 0.7816
+2026-04-21 19:07:38,972 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8164_epoch13_remaining0.7816.pt
+2026-04-21 19:08:16,402 - INFO - Epoch 014 | Val Loss: 0.4393 | Val Acc: 0.8401 | Remaining: 0.7671
+2026-04-21 19:08:16,408 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8401_epoch14_remaining0.7671.pt
+2026-04-21 19:08:52,789 - INFO - Epoch 015 | Val Loss: 0.4532 | Val Acc: 0.8354 | Remaining: 0.7599
+2026-04-21 19:08:53,022 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8354_epoch15_remaining0.7599.pt
+2026-04-21 19:09:32,129 - INFO - Epoch 016 | Val Loss: 0.4353 | Val Acc: 0.8426 | Remaining: 0.7527
+2026-04-21 19:09:32,136 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8426_epoch16_remaining0.7527.pt
+2026-04-21 19:10:11,768 - INFO - Epoch 017 | Val Loss: 0.4926 | Val Acc: 0.8253 | Remaining: 0.7274
+2026-04-21 19:10:11,775 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8253_epoch17_remaining0.7274.pt
+2026-04-21 19:10:51,001 - INFO - Epoch 018 | Val Loss: 0.4384 | Val Acc: 0.8455 | Remaining: 0.7130
+2026-04-21 19:10:51,008 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8455_epoch18_remaining0.7130.pt
+2026-04-21 19:11:29,369 - INFO - Epoch 019 | Val Loss: 0.4770 | Val Acc: 0.8271 | Remaining: 0.6968
+2026-04-21 19:11:29,377 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8271_epoch19_remaining0.6968.pt
+2026-04-21 19:12:08,307 - INFO - Epoch 020 | Val Loss: 0.5881 | Val Acc: 0.7847 | Remaining: 0.6805
+2026-04-21 19:12:08,314 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.7847_epoch20_remaining0.6805.pt
+2026-04-21 19:12:47,303 - INFO - Epoch 021 | Val Loss: 0.5434 | Val Acc: 0.8116 | Remaining: 0.6661
+2026-04-21 19:12:47,309 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8116_epoch21_remaining0.6661.pt
+2026-04-21 19:13:25,710 - INFO - Epoch 022 | Val Loss: 0.4649 | Val Acc: 0.8313 | Remaining: 0.6552
+2026-04-21 19:13:25,719 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8313_epoch22_remaining0.6552.pt
+2026-04-21 19:14:04,219 - INFO - Epoch 023 | Val Loss: 0.4473 | Val Acc: 0.8357 | Remaining: 0.6552
+2026-04-21 19:14:04,226 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8357_epoch23_remaining0.6552.pt
+2026-04-21 19:14:42,947 - INFO - Epoch 024 | Val Loss: 0.6225 | Val Acc: 0.7705 | Remaining: 0.6516
+2026-04-21 19:14:42,954 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.7705_epoch24_remaining0.6516.pt
+2026-04-21 19:15:21,546 - INFO - Epoch 025 | Val Loss: 0.5088 | Val Acc: 0.8142 | Remaining: 0.6426
+2026-04-21 19:15:21,555 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8142_epoch25_remaining0.6426.pt
+2026-04-21 19:15:59,154 - INFO - Epoch 026 | Val Loss: 0.4810 | Val Acc: 0.8223 | Remaining: 0.6282
+2026-04-21 19:15:59,161 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8223_epoch26_remaining0.6282.pt
+2026-04-21 19:16:37,271 - INFO - Epoch 027 | Val Loss: 0.4648 | Val Acc: 0.8293 | Remaining: 0.6191
+2026-04-21 19:16:37,278 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8293_epoch27_remaining0.6191.pt
+2026-04-21 19:17:16,017 - INFO - Epoch 028 | Val Loss: 0.4572 | Val Acc: 0.8351 | Remaining: 0.6137
+2026-04-21 19:17:16,023 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8351_epoch28_remaining0.6137.pt
+2026-04-21 19:17:52,712 - INFO - Epoch 029 | Val Loss: 0.4536 | Val Acc: 0.8365 | Remaining: 0.6119
+2026-04-21 19:17:52,719 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8365_epoch29_remaining0.6119.pt
+2026-04-21 19:18:30,795 - INFO - Epoch 030 | Val Loss: 0.5165 | Val Acc: 0.8084 | Remaining: 0.6029
+2026-04-21 19:18:30,801 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8084_epoch30_remaining0.6029.pt
+2026-04-21 19:19:07,313 - INFO - Epoch 031 | Val Loss: 0.4569 | Val Acc: 0.8339 | Remaining: 0.5939
+2026-04-21 19:19:07,319 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8339_epoch31_remaining0.5939.pt
+2026-04-21 19:19:43,740 - INFO - Epoch 032 | Val Loss: 0.4569 | Val Acc: 0.8365 | Remaining: 0.5812
+2026-04-21 19:19:43,747 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8365_epoch32_remaining0.5812.pt
+2026-04-21 19:20:22,252 - INFO - Epoch 033 | Val Loss: 0.4786 | Val Acc: 0.8239 | Remaining: 0.5740
+2026-04-21 19:20:22,259 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8239_epoch33_remaining0.5740.pt
+2026-04-21 19:20:59,205 - INFO - Epoch 034 | Val Loss: 0.4609 | Val Acc: 0.8340 | Remaining: 0.5686
+2026-04-21 19:20:59,212 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8340_epoch34_remaining0.5686.pt
+2026-04-21 19:21:38,193 - INFO - Epoch 035 | Val Loss: 0.4459 | Val Acc: 0.8376 | Remaining: 0.5668
+2026-04-21 19:21:38,200 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8376_epoch35_remaining0.5668.pt
+2026-04-21 19:22:15,898 - INFO - Epoch 036 | Val Loss: 0.4530 | Val Acc: 0.8354 | Remaining: 0.5650
+2026-04-21 19:22:15,905 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8354_epoch36_remaining0.5650.pt
+2026-04-21 19:22:54,714 - INFO - Epoch 037 | Val Loss: 0.4454 | Val Acc: 0.8394 | Remaining: 0.5614
+2026-04-21 19:22:54,721 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8394_epoch37_remaining0.5614.pt
+2026-04-21 19:23:32,160 - INFO - Epoch 038 | Val Loss: 0.4383 | Val Acc: 0.8396 | Remaining: 0.5578
+2026-04-21 19:23:32,166 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch38_remaining0.5578.pt
+2026-04-21 19:24:10,101 - INFO - Epoch 039 | Val Loss: 0.4485 | Val Acc: 0.8390 | Remaining: 0.5560
+2026-04-21 19:24:10,108 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8390_epoch39_remaining0.5560.pt
+2026-04-21 19:24:47,503 - INFO - Epoch 040 | Val Loss: 0.4360 | Val Acc: 0.8442 | Remaining: 0.5542
+2026-04-21 19:24:47,509 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8442_epoch40_remaining0.5542.pt
+2026-04-21 19:25:23,694 - INFO - Epoch 041 | Val Loss: 0.4402 | Val Acc: 0.8404 | Remaining: 0.5523
+2026-04-21 19:25:23,700 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8404_epoch41_remaining0.5523.pt
+2026-04-21 19:25:58,446 - INFO - Epoch 042 | Val Loss: 0.4356 | Val Acc: 0.8450 | Remaining: 0.5523
+2026-04-21 19:25:58,452 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8450_epoch42_remaining0.5523.pt
+2026-04-21 19:26:34,498 - INFO - Epoch 043 | Val Loss: 0.4457 | Val Acc: 0.8387 | Remaining: 0.5487
+2026-04-21 19:26:34,503 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8387_epoch43_remaining0.5487.pt
+2026-04-21 19:27:09,321 - INFO - Epoch 044 | Val Loss: 0.4509 | Val Acc: 0.8341 | Remaining: 0.5433
+2026-04-21 19:27:09,329 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8341_epoch44_remaining0.5433.pt
+2026-04-21 19:27:47,752 - INFO - Epoch 045 | Val Loss: 0.4408 | Val Acc: 0.8421 | Remaining: 0.5415
+2026-04-21 19:27:47,759 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8421_epoch45_remaining0.5415.pt
+2026-04-21 19:28:25,114 - INFO - Epoch 046 | Val Loss: 0.5160 | Val Acc: 0.8154 | Remaining: 0.5397
+2026-04-21 19:28:25,120 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8154_epoch46_remaining0.5397.pt
+2026-04-21 19:29:02,564 - INFO - Epoch 047 | Val Loss: 0.4471 | Val Acc: 0.8343 | Remaining: 0.5361
+2026-04-21 19:29:02,571 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8343_epoch47_remaining0.5361.pt
+2026-04-21 19:29:40,940 - INFO - Epoch 048 | Val Loss: 0.4433 | Val Acc: 0.8413 | Remaining: 0.5361
+2026-04-21 19:29:40,947 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8413_epoch48_remaining0.5361.pt
+2026-04-21 19:30:19,257 - INFO - Epoch 049 | Val Loss: 0.4358 | Val Acc: 0.8422 | Remaining: 0.5361
+2026-04-21 19:30:19,265 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8422_epoch49_remaining0.5361.pt
+2026-04-21 19:30:57,128 - INFO - Epoch 050 | Val Loss: 0.4375 | Val Acc: 0.8434 | Remaining: 0.5325
+2026-04-21 19:30:57,135 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8434_epoch50_remaining0.5325.pt
+2026-04-21 19:31:35,707 - INFO - Epoch 051 | Val Loss: 0.4399 | Val Acc: 0.8432 | Remaining: 0.5325
+2026-04-21 19:31:35,714 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8432_epoch51_remaining0.5325.pt
+2026-04-21 19:32:14,162 - INFO - Epoch 052 | Val Loss: 0.4424 | Val Acc: 0.8378 | Remaining: 0.5307
+2026-04-21 19:32:14,169 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8378_epoch52_remaining0.5307.pt
+2026-04-21 19:32:53,673 - INFO - Epoch 053 | Val Loss: 0.4401 | Val Acc: 0.8396 | Remaining: 0.5253
+2026-04-21 19:32:53,680 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch53_remaining0.5253.pt
+2026-04-21 19:33:30,898 - INFO - Epoch 054 | Val Loss: 0.4466 | Val Acc: 0.8400 | Remaining: 0.5235
+2026-04-21 19:33:30,905 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8400_epoch54_remaining0.5235.pt
+2026-04-21 19:34:09,807 - INFO - Epoch 055 | Val Loss: 0.4420 | Val Acc: 0.8371 | Remaining: 0.5217
+2026-04-21 19:34:09,814 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8371_epoch55_remaining0.5217.pt
+2026-04-21 19:34:47,325 - INFO - Epoch 056 | Val Loss: 0.4493 | Val Acc: 0.8371 | Remaining: 0.5217
+2026-04-21 19:34:47,330 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8371_epoch56_remaining0.5217.pt
+2026-04-21 19:35:25,887 - INFO - Epoch 057 | Val Loss: 0.4353 | Val Acc: 0.8446 | Remaining: 0.5199
+2026-04-21 19:35:25,894 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8446_epoch57_remaining0.5199.pt
+2026-04-21 19:36:05,255 - INFO - Epoch 058 | Val Loss: 0.4388 | Val Acc: 0.8396 | Remaining: 0.5199
+2026-04-21 19:36:05,263 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch58_remaining0.5199.pt
+2026-04-21 19:36:43,642 - INFO - Epoch 059 | Val Loss: 0.4446 | Val Acc: 0.8410 | Remaining: 0.5090
+2026-04-21 19:36:43,650 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8410_epoch59_remaining0.5090.pt
+2026-04-21 19:37:22,242 - INFO - Epoch 060 | Val Loss: 0.4400 | Val Acc: 0.8442 | Remaining: 0.5090
+2026-04-21 19:37:22,248 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8442_epoch60_remaining0.5090.pt
+2026-04-21 19:38:00,400 - INFO - Epoch 061 | Val Loss: 0.4369 | Val Acc: 0.8445 | Remaining: 0.5090
+2026-04-21 19:38:00,407 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8445_epoch61_remaining0.5090.pt
+2026-04-21 19:38:38,856 - INFO - Epoch 062 | Val Loss: 0.4400 | Val Acc: 0.8394 | Remaining: 0.5072
+2026-04-21 19:38:38,863 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8394_epoch62_remaining0.5072.pt
+2026-04-21 19:39:17,133 - INFO - Epoch 063 | Val Loss: 0.4399 | Val Acc: 0.8407 | Remaining: 0.5072
+2026-04-21 19:39:17,140 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8407_epoch63_remaining0.5072.pt
+2026-04-21 19:39:53,683 - INFO - Epoch 064 | Val Loss: 0.4373 | Val Acc: 0.8428 | Remaining: 0.5054
+2026-04-21 19:39:53,694 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8428_epoch64_remaining0.5054.pt
+2026-04-21 19:40:32,364 - INFO - Epoch 065 | Val Loss: 0.4424 | Val Acc: 0.8432 | Remaining: 0.5018
+2026-04-21 19:40:32,369 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8432_epoch65_remaining0.5018.pt
+2026-04-21 19:41:10,595 - INFO - Epoch 066 | Val Loss: 0.4562 | Val Acc: 0.8352 | Remaining: 0.5000
+2026-04-21 19:41:10,601 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8352_epoch66_remaining0.5000.pt
+2026-04-21 19:41:48,974 - INFO - Epoch 067 | Val Loss: 0.4364 | Val Acc: 0.8473 | Remaining: 0.4982
+2026-04-21 19:41:48,979 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8473_epoch67_remaining0.4982.pt
+2026-04-21 19:42:26,475 - INFO - Epoch 068 | Val Loss: 0.4348 | Val Acc: 0.8424 | Remaining: 0.4964
+2026-04-21 19:42:26,482 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8424_epoch68_remaining0.4964.pt
+2026-04-21 19:43:05,474 - INFO - Epoch 069 | Val Loss: 0.4322 | Val Acc: 0.8436 | Remaining: 0.4964
+2026-04-21 19:43:05,481 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8436_epoch69_remaining0.4964.pt
+2026-04-21 19:43:43,251 - INFO - Epoch 070 | Val Loss: 0.4322 | Val Acc: 0.8488 | Remaining: 0.4964
+2026-04-21 19:43:43,257 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8488_epoch70_remaining0.4964.pt
+2026-04-21 19:44:20,911 - INFO - Epoch 071 | Val Loss: 0.4374 | Val Acc: 0.8430 | Remaining: 0.4964
+2026-04-21 19:44:20,917 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8430_epoch71_remaining0.4964.pt
+2026-04-21 19:44:59,160 - INFO - Epoch 072 | Val Loss: 0.4382 | Val Acc: 0.8400 | Remaining: 0.4964
+2026-04-21 19:44:59,166 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8400_epoch72_remaining0.4964.pt
+2026-04-21 19:45:36,563 - INFO - Epoch 073 | Val Loss: 0.4370 | Val Acc: 0.8446 | Remaining: 0.4964
+2026-04-21 19:45:36,571 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8446_epoch73_remaining0.4964.pt
+2026-04-21 19:46:18,024 - INFO - Epoch 074 | Val Loss: 0.4330 | Val Acc: 0.8476 | Remaining: 0.4964
+2026-04-21 19:46:18,032 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8476_epoch74_remaining0.4964.pt
+2026-04-21 19:47:01,265 - INFO - Epoch 075 | Val Loss: 0.4331 | Val Acc: 0.8442 | Remaining: 0.4964
+2026-04-21 19:47:01,274 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8442_epoch75_remaining0.4964.pt
+2026-04-21 19:47:40,833 - INFO - Epoch 076 | Val Loss: 0.4345 | Val Acc: 0.8446 | Remaining: 0.4964
+2026-04-21 19:47:40,840 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8446_epoch76_remaining0.4964.pt
+2026-04-21 19:48:19,785 - INFO - Epoch 077 | Val Loss: 0.4295 | Val Acc: 0.8470 | Remaining: 0.4964
+2026-04-21 19:48:19,792 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8470_epoch77_remaining0.4964.pt
+2026-04-21 19:48:57,069 - INFO - Epoch 078 | Val Loss: 0.4286 | Val Acc: 0.8456 | Remaining: 0.4964
+2026-04-21 19:48:57,077 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8456_epoch78_remaining0.4964.pt
+2026-04-21 19:49:35,873 - INFO - Epoch 079 | Val Loss: 0.4378 | Val Acc: 0.8423 | Remaining: 0.4964
+2026-04-21 19:49:35,880 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8423_epoch79_remaining0.4964.pt
+2026-04-21 19:50:14,236 - INFO - Epoch 080 | Val Loss: 0.4336 | Val Acc: 0.8454 | Remaining: 0.4964
+2026-04-21 19:50:14,241 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8454_epoch80_remaining0.4964.pt
+2026-04-21 19:50:51,469 - INFO - Epoch 081 | Val Loss: 0.4276 | Val Acc: 0.8442 | Remaining: 0.4964
+2026-04-21 19:50:51,475 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8442_epoch81_remaining0.4964.pt
+2026-04-21 19:51:28,549 - INFO - Epoch 082 | Val Loss: 0.4456 | Val Acc: 0.8407 | Remaining: 0.4928
+2026-04-21 19:51:28,556 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8407_epoch82_remaining0.4928.pt
+2026-04-21 19:52:06,970 - INFO - Epoch 083 | Val Loss: 0.4322 | Val Acc: 0.8501 | Remaining: 0.4892
+2026-04-21 19:52:06,977 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8501_epoch83_remaining0.4892.pt
+2026-04-21 19:52:45,542 - INFO - Epoch 084 | Val Loss: 0.4352 | Val Acc: 0.8414 | Remaining: 0.4892
+2026-04-21 19:52:45,547 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8414_epoch84_remaining0.4892.pt
+2026-04-21 19:53:24,213 - INFO - Epoch 085 | Val Loss: 0.4276 | Val Acc: 0.8425 | Remaining: 0.4892
+2026-04-21 19:53:24,220 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8425_epoch85_remaining0.4892.pt
+2026-04-21 19:54:03,070 - INFO - Epoch 086 | Val Loss: 0.4264 | Val Acc: 0.8493 | Remaining: 0.4892
+2026-04-21 19:54:03,077 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8493_epoch86_remaining0.4892.pt
+2026-04-21 19:54:41,367 - INFO - Epoch 087 | Val Loss: 0.4451 | Val Acc: 0.8401 | Remaining: 0.4874
+2026-04-21 19:54:41,374 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8401_epoch87_remaining0.4874.pt
+2026-04-21 19:55:19,573 - INFO - Epoch 088 | Val Loss: 0.4318 | Val Acc: 0.8444 | Remaining: 0.4874
+2026-04-21 19:55:19,581 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8444_epoch88_remaining0.4874.pt
+2026-04-21 19:55:57,221 - INFO - Epoch 089 | Val Loss: 0.4288 | Val Acc: 0.8416 | Remaining: 0.4874
+2026-04-21 19:55:57,228 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8416_epoch89_remaining0.4874.pt
+2026-04-21 19:56:36,220 - INFO - Epoch 090 | Val Loss: 0.4271 | Val Acc: 0.8462 | Remaining: 0.4874
+2026-04-21 19:56:36,228 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8462_epoch90_remaining0.4874.pt
+2026-04-21 19:57:14,901 - INFO - Epoch 091 | Val Loss: 0.4258 | Val Acc: 0.8417 | Remaining: 0.4874
+2026-04-21 19:57:14,907 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8417_epoch91_remaining0.4874.pt
+2026-04-21 19:57:55,444 - INFO - Epoch 092 | Val Loss: 0.4366 | Val Acc: 0.8390 | Remaining: 0.4838
+2026-04-21 19:57:55,451 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8390_epoch92_remaining0.4838.pt
+2026-04-21 19:58:37,285 - INFO - Epoch 093 | Val Loss: 0.4392 | Val Acc: 0.8414 | Remaining: 0.4838
+2026-04-21 19:58:37,293 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8414_epoch93_remaining0.4838.pt
+2026-04-21 19:59:19,611 - INFO - Epoch 094 | Val Loss: 0.4371 | Val Acc: 0.8430 | Remaining: 0.4819
+2026-04-21 19:59:19,619 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8430_epoch94_remaining0.4819.pt
+2026-04-21 20:00:02,159 - INFO - Epoch 095 | Val Loss: 0.4317 | Val Acc: 0.8430 | Remaining: 0.4801
+2026-04-21 20:00:02,166 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8430_epoch95_remaining0.4801.pt
+2026-04-21 20:00:44,222 - INFO - Epoch 096 | Val Loss: 0.4295 | Val Acc: 0.8445 | Remaining: 0.4801
+2026-04-21 20:00:44,229 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8445_epoch96_remaining0.4801.pt
+2026-04-21 20:01:24,905 - INFO - Epoch 097 | Val Loss: 0.4319 | Val Acc: 0.8416 | Remaining: 0.4801
+2026-04-21 20:01:24,913 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8416_epoch97_remaining0.4801.pt
+2026-04-21 20:02:05,428 - INFO - Epoch 098 | Val Loss: 0.4296 | Val Acc: 0.8447 | Remaining: 0.4801
+2026-04-21 20:02:05,436 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8447_epoch98_remaining0.4801.pt
+2026-04-21 20:02:45,794 - INFO - Epoch 099 | Val Loss: 0.4272 | Val Acc: 0.8452 | Remaining: 0.4801
+2026-04-21 20:02:45,801 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8452_epoch99_remaining0.4801.pt
+2026-04-21 20:03:25,710 - INFO - Epoch 100 | Val Loss: 0.4303 | Val Acc: 0.8432 | Remaining: 0.4801
+2026-04-21 20:03:25,718 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8432_epoch100_remaining0.4801.pt
+2026-04-21 20:04:06,494 - INFO - Epoch 101 | Val Loss: 0.4340 | Val Acc: 0.8417 | Remaining: 0.4783
+2026-04-21 20:04:06,501 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8417_epoch101_remaining0.4783.pt
+2026-04-21 20:04:46,747 - INFO - Epoch 102 | Val Loss: 0.4386 | Val Acc: 0.8386 | Remaining: 0.4783
+2026-04-21 20:04:46,755 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8386_epoch102_remaining0.4783.pt
+2026-04-21 20:05:27,173 - INFO - Epoch 103 | Val Loss: 0.4367 | Val Acc: 0.8399 | Remaining: 0.4765
+2026-04-21 20:05:27,181 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8399_epoch103_remaining0.4765.pt
+2026-04-21 20:06:07,320 - INFO - Epoch 104 | Val Loss: 0.4426 | Val Acc: 0.8380 | Remaining: 0.4729
+2026-04-21 20:06:07,329 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8380_epoch104_remaining0.4729.pt
+2026-04-21 20:06:46,138 - INFO - Epoch 105 | Val Loss: 0.4293 | Val Acc: 0.8431 | Remaining: 0.4729
+2026-04-21 20:06:46,146 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8431_epoch105_remaining0.4729.pt
+2026-04-21 20:07:26,249 - INFO - Epoch 106 | Val Loss: 0.4318 | Val Acc: 0.8429 | Remaining: 0.4711
+2026-04-21 20:07:26,255 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8429_epoch106_remaining0.4711.pt
+2026-04-21 20:08:05,750 - INFO - Epoch 107 | Val Loss: 0.4299 | Val Acc: 0.8454 | Remaining: 0.4711
+2026-04-21 20:08:05,757 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8454_epoch107_remaining0.4711.pt
+2026-04-21 20:08:46,219 - INFO - Epoch 108 | Val Loss: 0.4284 | Val Acc: 0.8452 | Remaining: 0.4693
+2026-04-21 20:08:46,226 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8452_epoch108_remaining0.4693.pt
+2026-04-21 20:09:26,556 - INFO - Epoch 109 | Val Loss: 0.4351 | Val Acc: 0.8384 | Remaining: 0.4693
+2026-04-21 20:09:26,564 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8384_epoch109_remaining0.4693.pt
+2026-04-21 20:10:07,358 - INFO - Epoch 110 | Val Loss: 0.4259 | Val Acc: 0.8458 | Remaining: 0.4693
+2026-04-21 20:10:07,364 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8458_epoch110_remaining0.4693.pt
+2026-04-21 20:10:45,428 - INFO - Epoch 111 | Val Loss: 0.4242 | Val Acc: 0.8480 | Remaining: 0.4675
+2026-04-21 20:10:45,440 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8480_epoch111_remaining0.4675.pt
+2026-04-21 20:11:25,592 - INFO - Epoch 112 | Val Loss: 0.4287 | Val Acc: 0.8449 | Remaining: 0.4675
+2026-04-21 20:11:25,598 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8449_epoch112_remaining0.4675.pt
+2026-04-21 20:12:06,295 - INFO - Epoch 113 | Val Loss: 0.4354 | Val Acc: 0.8437 | Remaining: 0.4675
+2026-04-21 20:12:06,303 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8437_epoch113_remaining0.4675.pt
+2026-04-21 20:12:46,286 - INFO - Epoch 114 | Val Loss: 0.4387 | Val Acc: 0.8395 | Remaining: 0.4675
+2026-04-21 20:12:46,293 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8395_epoch114_remaining0.4675.pt
+2026-04-21 20:13:26,007 - INFO - Epoch 115 | Val Loss: 0.4324 | Val Acc: 0.8433 | Remaining: 0.4675
+2026-04-21 20:13:26,015 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8433_epoch115_remaining0.4675.pt
+2026-04-21 20:14:06,058 - INFO - Epoch 116 | Val Loss: 0.4301 | Val Acc: 0.8448 | Remaining: 0.4675
+2026-04-21 20:14:06,064 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8448_epoch116_remaining0.4675.pt
+2026-04-21 20:14:46,245 - INFO - Epoch 117 | Val Loss: 0.4283 | Val Acc: 0.8441 | Remaining: 0.4675
+2026-04-21 20:14:46,252 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8441_epoch117_remaining0.4675.pt
+2026-04-21 20:15:26,932 - INFO - Epoch 118 | Val Loss: 0.4275 | Val Acc: 0.8448 | Remaining: 0.4675
+2026-04-21 20:15:26,940 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8448_epoch118_remaining0.4675.pt
+2026-04-21 20:16:05,325 - INFO - Epoch 119 | Val Loss: 0.4341 | Val Acc: 0.8430 | Remaining: 0.4657
+2026-04-21 20:16:05,333 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8430_epoch119_remaining0.4657.pt
+2026-04-21 20:16:44,965 - INFO - Epoch 120 | Val Loss: 0.4316 | Val Acc: 0.8459 | Remaining: 0.4657
+2026-04-21 20:16:44,972 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8459_epoch120_remaining0.4657.pt
+2026-04-21 20:17:24,951 - INFO - Epoch 121 | Val Loss: 0.4223 | Val Acc: 0.8458 | Remaining: 0.4657
+2026-04-21 20:17:24,959 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8458_epoch121_remaining0.4657.pt
+2026-04-21 20:18:04,393 - INFO - Epoch 122 | Val Loss: 0.4275 | Val Acc: 0.8448 | Remaining: 0.4639
+2026-04-21 20:18:04,400 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8448_epoch122_remaining0.4639.pt
+2026-04-21 20:18:43,739 - INFO - Epoch 123 | Val Loss: 0.4350 | Val Acc: 0.8423 | Remaining: 0.4639
+2026-04-21 20:18:43,746 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8423_epoch123_remaining0.4639.pt
+2026-04-21 20:19:23,633 - INFO - Epoch 124 | Val Loss: 0.4343 | Val Acc: 0.8433 | Remaining: 0.4639
+2026-04-21 20:19:23,641 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8433_epoch124_remaining0.4639.pt
+2026-04-21 20:20:03,645 - INFO - Epoch 125 | Val Loss: 0.4350 | Val Acc: 0.8414 | Remaining: 0.4639
+2026-04-21 20:20:03,653 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8414_epoch125_remaining0.4639.pt
+2026-04-21 20:20:43,599 - INFO - Epoch 126 | Val Loss: 0.4238 | Val Acc: 0.8466 | Remaining: 0.4639
+2026-04-21 20:20:43,608 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8466_epoch126_remaining0.4639.pt
+2026-04-21 20:21:23,224 - INFO - Epoch 127 | Val Loss: 0.4262 | Val Acc: 0.8425 | Remaining: 0.4639
+2026-04-21 20:21:23,232 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8425_epoch127_remaining0.4639.pt
+2026-04-21 20:22:05,174 - INFO - Epoch 128 | Val Loss: 0.4277 | Val Acc: 0.8451 | Remaining: 0.4621
+2026-04-21 20:22:05,183 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8451_epoch128_remaining0.4621.pt
+2026-04-21 20:22:46,309 - INFO - Epoch 129 | Val Loss: 0.4268 | Val Acc: 0.8458 | Remaining: 0.4603
+2026-04-21 20:22:46,317 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8458_epoch129_remaining0.4603.pt
+2026-04-21 20:23:25,759 - INFO - Epoch 130 | Val Loss: 0.4307 | Val Acc: 0.8454 | Remaining: 0.4603
+2026-04-21 20:23:25,766 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8454_epoch130_remaining0.4603.pt
+2026-04-21 20:24:06,323 - INFO - Epoch 131 | Val Loss: 0.4303 | Val Acc: 0.8436 | Remaining: 0.4603
+2026-04-21 20:24:06,330 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8436_epoch131_remaining0.4603.pt
+2026-04-21 20:24:46,792 - INFO - Epoch 132 | Val Loss: 0.4343 | Val Acc: 0.8412 | Remaining: 0.4585
+2026-04-21 20:24:46,800 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8412_epoch132_remaining0.4585.pt
+2026-04-21 20:25:28,108 - INFO - Epoch 133 | Val Loss: 0.4219 | Val Acc: 0.8460 | Remaining: 0.4567
+2026-04-21 20:25:28,116 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8460_epoch133_remaining0.4567.pt
+2026-04-21 20:26:08,988 - INFO - Epoch 134 | Val Loss: 0.4325 | Val Acc: 0.8410 | Remaining: 0.4567
+2026-04-21 20:26:08,996 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8410_epoch134_remaining0.4567.pt
+2026-04-21 20:26:50,434 - INFO - Epoch 135 | Val Loss: 0.4336 | Val Acc: 0.8449 | Remaining: 0.4567
+2026-04-21 20:26:50,442 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8449_epoch135_remaining0.4567.pt
+2026-04-21 20:27:31,227 - INFO - Epoch 136 | Val Loss: 0.4281 | Val Acc: 0.8431 | Remaining: 0.4567
+2026-04-21 20:27:31,236 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8431_epoch136_remaining0.4567.pt
+2026-04-21 20:28:12,462 - INFO - Epoch 137 | Val Loss: 0.4261 | Val Acc: 0.8434 | Remaining: 0.4567
+2026-04-21 20:28:12,468 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8434_epoch137_remaining0.4567.pt
+2026-04-21 20:28:53,991 - INFO - Epoch 138 | Val Loss: 0.4408 | Val Acc: 0.8438 | Remaining: 0.4567
+2026-04-21 20:28:53,999 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8438_epoch138_remaining0.4567.pt
+2026-04-21 20:29:35,359 - INFO - Epoch 139 | Val Loss: 0.4327 | Val Acc: 0.8407 | Remaining: 0.4567
+2026-04-21 20:29:35,367 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8407_epoch139_remaining0.4567.pt
+2026-04-21 20:30:16,599 - INFO - Epoch 140 | Val Loss: 0.4296 | Val Acc: 0.8472 | Remaining: 0.4567
+2026-04-21 20:30:16,607 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8472_epoch140_remaining0.4567.pt
+2026-04-21 20:30:57,797 - INFO - Epoch 141 | Val Loss: 0.4288 | Val Acc: 0.8433 | Remaining: 0.4567
+2026-04-21 20:30:57,805 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8433_epoch141_remaining0.4567.pt
+2026-04-21 20:31:39,493 - INFO - Epoch 142 | Val Loss: 0.4264 | Val Acc: 0.8470 | Remaining: 0.4567
+2026-04-21 20:31:39,501 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8470_epoch142_remaining0.4567.pt
+2026-04-21 20:32:20,010 - INFO - Epoch 143 | Val Loss: 0.4321 | Val Acc: 0.8443 | Remaining: 0.4549
+2026-04-21 20:32:20,018 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8443_epoch143_remaining0.4549.pt
+2026-04-21 20:33:00,530 - INFO - Epoch 144 | Val Loss: 0.4240 | Val Acc: 0.8480 | Remaining: 0.4549
+2026-04-21 20:33:00,538 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8480_epoch144_remaining0.4549.pt
+2026-04-21 20:33:41,913 - INFO - Epoch 145 | Val Loss: 0.4283 | Val Acc: 0.8448 | Remaining: 0.4549
+2026-04-21 20:33:41,921 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8448_epoch145_remaining0.4549.pt
+2026-04-21 20:34:22,920 - INFO - Epoch 146 | Val Loss: 0.4245 | Val Acc: 0.8487 | Remaining: 0.4531
+2026-04-21 20:34:22,929 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8487_epoch146_remaining0.4531.pt
+2026-04-21 20:35:04,500 - INFO - Epoch 147 | Val Loss: 0.4262 | Val Acc: 0.8456 | Remaining: 0.4531
+2026-04-21 20:35:04,508 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8456_epoch147_remaining0.4531.pt
+2026-04-21 20:35:44,889 - INFO - Epoch 148 | Val Loss: 0.4392 | Val Acc: 0.8421 | Remaining: 0.4531
+2026-04-21 20:35:44,898 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8421_epoch148_remaining0.4531.pt
+2026-04-21 20:36:24,691 - INFO - Epoch 149 | Val Loss: 0.4333 | Val Acc: 0.8385 | Remaining: 0.4531
+2026-04-21 20:36:24,699 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8385_epoch149_remaining0.4531.pt
+2026-04-21 20:37:04,936 - INFO - Epoch 150 | Val Loss: 0.4351 | Val Acc: 0.8411 | Remaining: 0.4513
+2026-04-21 20:37:04,943 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8411_epoch150_remaining0.4513.pt
+2026-04-21 20:37:46,143 - INFO - Epoch 151 | Val Loss: 0.8590 | Val Acc: 0.7091 | Remaining: 0.4495
+2026-04-21 20:37:46,157 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.7091_epoch151_remaining0.4495.pt
+2026-04-21 20:38:27,075 - INFO - Epoch 152 | Val Loss: 0.4732 | Val Acc: 0.8256 | Remaining: 0.4458
+2026-04-21 20:38:27,083 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8256_epoch152_remaining0.4458.pt
+2026-04-21 20:39:08,372 - INFO - Epoch 153 | Val Loss: 0.4619 | Val Acc: 0.8318 | Remaining: 0.4458
+2026-04-21 20:39:08,379 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8318_epoch153_remaining0.4458.pt
+2026-04-21 20:39:49,204 - INFO - Epoch 154 | Val Loss: 0.4622 | Val Acc: 0.8311 | Remaining: 0.4458
+2026-04-21 20:39:49,222 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8311_epoch154_remaining0.4458.pt
+2026-04-21 20:40:30,268 - INFO - Epoch 155 | Val Loss: 0.4664 | Val Acc: 0.8310 | Remaining: 0.4440
+2026-04-21 20:40:30,276 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8310_epoch155_remaining0.4440.pt
+2026-04-21 20:41:11,580 - INFO - Epoch 156 | Val Loss: 0.4582 | Val Acc: 0.8347 | Remaining: 0.4422
+2026-04-21 20:41:11,588 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8347_epoch156_remaining0.4422.pt
+2026-04-21 20:41:53,124 - INFO - Epoch 157 | Val Loss: 0.4572 | Val Acc: 0.8332 | Remaining: 0.4404
+2026-04-21 20:41:53,132 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8332_epoch157_remaining0.4404.pt
+2026-04-21 20:42:34,524 - INFO - Epoch 158 | Val Loss: 0.4689 | Val Acc: 0.8273 | Remaining: 0.4332
+2026-04-21 20:42:34,533 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8273_epoch158_remaining0.4332.pt
+2026-04-21 20:43:15,743 - INFO - Epoch 159 | Val Loss: 0.4464 | Val Acc: 0.8355 | Remaining: 0.4332
+2026-04-21 20:43:15,753 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8355_epoch159_remaining0.4332.pt
+2026-04-21 20:43:57,396 - INFO - Epoch 160 | Val Loss: 0.4447 | Val Acc: 0.8386 | Remaining: 0.4296
+2026-04-21 20:43:57,404 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8386_epoch160_remaining0.4296.pt
+2026-04-21 20:44:38,899 - INFO - Epoch 161 | Val Loss: 0.4554 | Val Acc: 0.8350 | Remaining: 0.4296
+2026-04-21 20:44:38,907 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8350_epoch161_remaining0.4296.pt
+2026-04-21 20:45:20,951 - INFO - Epoch 162 | Val Loss: 0.4469 | Val Acc: 0.8351 | Remaining: 0.4260
+2026-04-21 20:45:20,958 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8351_epoch162_remaining0.4260.pt
+2026-04-21 20:46:02,647 - INFO - Epoch 163 | Val Loss: 0.4520 | Val Acc: 0.8369 | Remaining: 0.4242
+2026-04-21 20:46:02,658 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8369_epoch163_remaining0.4242.pt
+2026-04-21 20:46:44,381 - INFO - Epoch 164 | Val Loss: 0.4533 | Val Acc: 0.8330 | Remaining: 0.4224
+2026-04-21 20:46:44,390 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8330_epoch164_remaining0.4224.pt
+2026-04-21 20:47:25,767 - INFO - Epoch 165 | Val Loss: 0.5444 | Val Acc: 0.7982 | Remaining: 0.4152
+2026-04-21 20:47:25,775 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.7982_epoch165_remaining0.4152.pt
+2026-04-21 20:48:04,958 - INFO - Epoch 166 | Val Loss: 0.4565 | Val Acc: 0.8321 | Remaining: 0.4134
+2026-04-21 20:48:04,965 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8321_epoch166_remaining0.4134.pt
+2026-04-21 20:48:43,196 - INFO - Epoch 167 | Val Loss: 0.4474 | Val Acc: 0.8373 | Remaining: 0.4116
+2026-04-21 20:48:43,203 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8373_epoch167_remaining0.4116.pt
+2026-04-21 20:49:21,605 - INFO - Epoch 168 | Val Loss: 0.4525 | Val Acc: 0.8345 | Remaining: 0.4097
+2026-04-21 20:49:21,613 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8345_epoch168_remaining0.4097.pt
+2026-04-21 20:49:59,504 - INFO - Epoch 169 | Val Loss: 0.4488 | Val Acc: 0.8373 | Remaining: 0.4061
+2026-04-21 20:49:59,511 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8373_epoch169_remaining0.4061.pt
+2026-04-21 20:50:37,627 - INFO - Epoch 170 | Val Loss: 0.4842 | Val Acc: 0.8229 | Remaining: 0.3989
+2026-04-21 20:50:37,633 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8229_epoch170_remaining0.3989.pt
+2026-04-21 20:51:15,135 - INFO - Epoch 171 | Val Loss: 0.4444 | Val Acc: 0.8382 | Remaining: 0.3989
+2026-04-21 20:51:15,142 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8382_epoch171_remaining0.3989.pt
+2026-04-21 20:51:53,566 - INFO - Epoch 172 | Val Loss: 0.4563 | Val Acc: 0.8356 | Remaining: 0.3953
+2026-04-21 20:51:53,573 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8356_epoch172_remaining0.3953.pt
+2026-04-21 20:52:31,930 - INFO - Epoch 173 | Val Loss: 0.4519 | Val Acc: 0.8355 | Remaining: 0.3935
+2026-04-21 20:52:31,936 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8355_epoch173_remaining0.3935.pt
+2026-04-21 20:53:09,819 - INFO - Epoch 174 | Val Loss: 0.4473 | Val Acc: 0.8371 | Remaining: 0.3935
+2026-04-21 20:53:09,825 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8371_epoch174_remaining0.3935.pt
+2026-04-21 20:53:46,336 - INFO - Epoch 175 | Val Loss: 0.4523 | Val Acc: 0.8362 | Remaining: 0.3935
+2026-04-21 20:53:46,344 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8362_epoch175_remaining0.3935.pt
+2026-04-21 20:54:22,950 - INFO - Epoch 176 | Val Loss: 0.4526 | Val Acc: 0.8406 | Remaining: 0.3935
+2026-04-21 20:54:22,957 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8406_epoch176_remaining0.3935.pt
+2026-04-21 20:55:01,410 - INFO - Epoch 177 | Val Loss: 0.4456 | Val Acc: 0.8364 | Remaining: 0.3935
+2026-04-21 20:55:01,418 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8364_epoch177_remaining0.3935.pt
+2026-04-21 20:55:40,535 - INFO - Epoch 178 | Val Loss: 0.4451 | Val Acc: 0.8388 | Remaining: 0.3935
+2026-04-21 20:55:40,542 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8388_epoch178_remaining0.3935.pt
+2026-04-21 20:56:14,722 - INFO - Epoch 179 | Val Loss: 0.4480 | Val Acc: 0.8381 | Remaining: 0.3935
+2026-04-21 20:56:14,728 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8381_epoch179_remaining0.3935.pt
+2026-04-21 20:56:52,359 - INFO - Epoch 180 | Val Loss: 0.4540 | Val Acc: 0.8384 | Remaining: 0.3935
+2026-04-21 20:56:52,366 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8384_epoch180_remaining0.3935.pt
+2026-04-21 20:57:31,207 - INFO - Epoch 181 | Val Loss: 0.4446 | Val Acc: 0.8396 | Remaining: 0.3935
+2026-04-21 20:57:31,212 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch181_remaining0.3935.pt
+2026-04-21 20:58:09,156 - INFO - Epoch 182 | Val Loss: 0.4508 | Val Acc: 0.8374 | Remaining: 0.3917
+2026-04-21 20:58:09,164 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8374_epoch182_remaining0.3917.pt
+2026-04-21 20:58:47,732 - INFO - Epoch 183 | Val Loss: 0.4440 | Val Acc: 0.8388 | Remaining: 0.3917
+2026-04-21 20:58:47,739 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8388_epoch183_remaining0.3917.pt
+2026-04-21 20:59:25,526 - INFO - Epoch 184 | Val Loss: 0.4416 | Val Acc: 0.8396 | Remaining: 0.3917
+2026-04-21 20:59:25,536 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch184_remaining0.3917.pt
+2026-04-21 21:00:03,869 - INFO - Epoch 185 | Val Loss: 0.4519 | Val Acc: 0.8368 | Remaining: 0.3899
+2026-04-21 21:00:03,876 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8368_epoch185_remaining0.3899.pt
+2026-04-21 21:00:42,403 - INFO - Epoch 186 | Val Loss: 0.4448 | Val Acc: 0.8408 | Remaining: 0.3899
+2026-04-21 21:00:42,410 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8408_epoch186_remaining0.3899.pt
+2026-04-21 21:01:18,248 - INFO - Epoch 187 | Val Loss: 0.4434 | Val Acc: 0.8408 | Remaining: 0.3881
+2026-04-21 21:01:18,256 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8408_epoch187_remaining0.3881.pt
+2026-04-21 21:01:56,565 - INFO - Epoch 188 | Val Loss: 0.4435 | Val Acc: 0.8376 | Remaining: 0.3881
+2026-04-21 21:01:56,571 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8376_epoch188_remaining0.3881.pt
+2026-04-21 21:02:34,948 - INFO - Epoch 189 | Val Loss: 0.4501 | Val Acc: 0.8379 | Remaining: 0.3881
+2026-04-21 21:02:34,954 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8379_epoch189_remaining0.3881.pt
+2026-04-21 21:03:12,676 - INFO - Epoch 190 | Val Loss: 0.4438 | Val Acc: 0.8394 | Remaining: 0.3881
+2026-04-21 21:03:12,684 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8394_epoch190_remaining0.3881.pt
+2026-04-21 21:03:50,823 - INFO - Epoch 191 | Val Loss: 0.4415 | Val Acc: 0.8400 | Remaining: 0.3881
+2026-04-21 21:03:50,831 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8400_epoch191_remaining0.3881.pt
+2026-04-21 21:04:28,485 - INFO - Epoch 192 | Val Loss: 0.4417 | Val Acc: 0.8399 | Remaining: 0.3881
+2026-04-21 21:04:28,491 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8399_epoch192_remaining0.3881.pt
+2026-04-21 21:05:04,941 - INFO - Epoch 193 | Val Loss: 0.4398 | Val Acc: 0.8407 | Remaining: 0.3863
+2026-04-21 21:05:04,948 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8407_epoch193_remaining0.3863.pt
+2026-04-21 21:05:42,234 - INFO - Epoch 194 | Val Loss: 0.4532 | Val Acc: 0.8364 | Remaining: 0.3863
+2026-04-21 21:05:42,240 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8364_epoch194_remaining0.3863.pt
+2026-04-21 21:06:19,716 - INFO - Epoch 195 | Val Loss: 0.4417 | Val Acc: 0.8396 | Remaining: 0.3863
+2026-04-21 21:06:19,722 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch195_remaining0.3863.pt
+2026-04-21 21:06:55,629 - INFO - Epoch 196 | Val Loss: 0.4441 | Val Acc: 0.8421 | Remaining: 0.3863
+2026-04-21 21:06:55,635 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8421_epoch196_remaining0.3863.pt
+2026-04-21 21:07:33,525 - INFO - Epoch 197 | Val Loss: 0.4461 | Val Acc: 0.8383 | Remaining: 0.3863
+2026-04-21 21:07:33,531 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8383_epoch197_remaining0.3863.pt
+2026-04-21 21:08:10,025 - INFO - Epoch 198 | Val Loss: 0.4448 | Val Acc: 0.8387 | Remaining: 0.3863
+2026-04-21 21:08:10,033 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8387_epoch198_remaining0.3863.pt
+2026-04-21 21:08:48,597 - INFO - Epoch 199 | Val Loss: 0.4447 | Val Acc: 0.8383 | Remaining: 0.3863
+2026-04-21 21:08:48,603 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8383_epoch199_remaining0.3863.pt
+2026-04-21 21:09:26,790 - INFO - Epoch 200 | Val Loss: 0.4421 | Val Acc: 0.8420 | Remaining: 0.3863
+2026-04-21 21:09:26,795 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8420_epoch200_remaining0.3863.pt
+2026-04-21 21:10:04,099 - INFO - Epoch 201 | Val Loss: 0.4483 | Val Acc: 0.8357 | Remaining: 0.3863
+2026-04-21 21:10:04,105 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8357_epoch201_remaining0.3863.pt
+2026-04-21 21:10:39,797 - INFO - Epoch 202 | Val Loss: 0.4454 | Val Acc: 0.8381 | Remaining: 0.3863
+2026-04-21 21:10:39,802 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8381_epoch202_remaining0.3863.pt
+2026-04-21 21:11:17,039 - INFO - Epoch 203 | Val Loss: 0.4518 | Val Acc: 0.8380 | Remaining: 0.3863
+2026-04-21 21:11:17,046 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8380_epoch203_remaining0.3863.pt
+2026-04-21 21:11:54,964 - INFO - Epoch 204 | Val Loss: 0.4457 | Val Acc: 0.8372 | Remaining: 0.3863
+2026-04-21 21:11:54,969 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8372_epoch204_remaining0.3863.pt
+2026-04-21 21:12:32,963 - INFO - Epoch 205 | Val Loss: 0.4412 | Val Acc: 0.8373 | Remaining: 0.3845
+2026-04-21 21:12:32,969 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8373_epoch205_remaining0.3845.pt
+2026-04-21 21:13:10,127 - INFO - Epoch 206 | Val Loss: 0.4451 | Val Acc: 0.8396 | Remaining: 0.3845
+2026-04-21 21:13:10,133 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch206_remaining0.3845.pt
+2026-04-21 21:13:48,003 - INFO - Epoch 207 | Val Loss: 0.4433 | Val Acc: 0.8389 | Remaining: 0.3845
+2026-04-21 21:13:48,008 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8389_epoch207_remaining0.3845.pt
+2026-04-21 21:14:23,941 - INFO - Epoch 208 | Val Loss: 0.4419 | Val Acc: 0.8387 | Remaining: 0.3845
+2026-04-21 21:14:23,947 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8387_epoch208_remaining0.3845.pt
+2026-04-21 21:15:00,327 - INFO - Epoch 209 | Val Loss: 0.4430 | Val Acc: 0.8415 | Remaining: 0.3845
+2026-04-21 21:15:00,334 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8415_epoch209_remaining0.3845.pt
+2026-04-21 21:15:37,488 - INFO - Epoch 210 | Val Loss: 0.4449 | Val Acc: 0.8393 | Remaining: 0.3845
+2026-04-21 21:15:37,495 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8393_epoch210_remaining0.3845.pt
+2026-04-21 21:16:14,003 - INFO - Epoch 211 | Val Loss: 0.4411 | Val Acc: 0.8402 | Remaining: 0.3845
+2026-04-21 21:16:14,008 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8402_epoch211_remaining0.3845.pt
+2026-04-21 21:16:52,425 - INFO - Epoch 212 | Val Loss: 0.4464 | Val Acc: 0.8359 | Remaining: 0.3845
+2026-04-21 21:16:52,431 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8359_epoch212_remaining0.3845.pt
+2026-04-21 21:17:30,211 - INFO - Epoch 213 | Val Loss: 0.4383 | Val Acc: 0.8406 | Remaining: 0.3845
+2026-04-21 21:17:30,217 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8406_epoch213_remaining0.3845.pt
+2026-04-21 21:18:07,248 - INFO - Epoch 214 | Val Loss: 0.4424 | Val Acc: 0.8382 | Remaining: 0.3845
+2026-04-21 21:18:07,254 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8382_epoch214_remaining0.3845.pt
+2026-04-21 21:18:43,326 - INFO - Epoch 215 | Val Loss: 0.4403 | Val Acc: 0.8405 | Remaining: 0.3845
+2026-04-21 21:18:43,332 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8405_epoch215_remaining0.3845.pt
+2026-04-21 21:19:20,420 - INFO - Epoch 216 | Val Loss: 0.4375 | Val Acc: 0.8425 | Remaining: 0.3845
+2026-04-21 21:19:20,426 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8425_epoch216_remaining0.3845.pt
+2026-04-21 21:19:58,404 - INFO - Epoch 217 | Val Loss: 0.4534 | Val Acc: 0.8339 | Remaining: 0.3827
+2026-04-21 21:19:58,410 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8339_epoch217_remaining0.3827.pt
+2026-04-21 21:20:35,455 - INFO - Epoch 218 | Val Loss: 0.4455 | Val Acc: 0.8396 | Remaining: 0.3827
+2026-04-21 21:20:35,460 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch218_remaining0.3827.pt
+2026-04-21 21:21:12,319 - INFO - Epoch 219 | Val Loss: 0.4457 | Val Acc: 0.8373 | Remaining: 0.3827
+2026-04-21 21:21:12,326 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8373_epoch219_remaining0.3827.pt
+2026-04-21 21:21:50,254 - INFO - Epoch 220 | Val Loss: 0.4462 | Val Acc: 0.8403 | Remaining: 0.3827
+2026-04-21 21:21:50,259 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8403_epoch220_remaining0.3827.pt
+2026-04-21 21:22:27,414 - INFO - Epoch 221 | Val Loss: 0.4443 | Val Acc: 0.8379 | Remaining: 0.3827
+2026-04-21 21:22:27,422 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8379_epoch221_remaining0.3827.pt
+2026-04-21 21:23:05,784 - INFO - Epoch 222 | Val Loss: 0.4506 | Val Acc: 0.8371 | Remaining: 0.3827
+2026-04-21 21:23:05,789 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8371_epoch222_remaining0.3827.pt
+2026-04-21 21:23:43,739 - INFO - Epoch 223 | Val Loss: 0.4416 | Val Acc: 0.8404 | Remaining: 0.3827
+2026-04-21 21:23:43,747 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8404_epoch223_remaining0.3827.pt
+2026-04-21 21:24:21,352 - INFO - Epoch 224 | Val Loss: 0.4418 | Val Acc: 0.8449 | Remaining: 0.3827
+2026-04-21 21:24:21,359 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8449_epoch224_remaining0.3827.pt
+2026-04-21 21:24:59,316 - INFO - Epoch 225 | Val Loss: 0.4481 | Val Acc: 0.8380 | Remaining: 0.3827
+2026-04-21 21:24:59,321 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8380_epoch225_remaining0.3827.pt
+2026-04-21 21:25:34,415 - INFO - Epoch 226 | Val Loss: 0.4453 | Val Acc: 0.8353 | Remaining: 0.3827
+2026-04-21 21:25:34,422 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8353_epoch226_remaining0.3827.pt
+2026-04-21 21:26:12,860 - INFO - Epoch 227 | Val Loss: 0.4447 | Val Acc: 0.8389 | Remaining: 0.3827
+2026-04-21 21:26:12,866 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8389_epoch227_remaining0.3827.pt
+2026-04-21 21:26:48,883 - INFO - Epoch 228 | Val Loss: 0.4423 | Val Acc: 0.8376 | Remaining: 0.3827
+2026-04-21 21:26:48,889 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8376_epoch228_remaining0.3827.pt
+2026-04-21 21:27:27,421 - INFO - Epoch 229 | Val Loss: 0.4466 | Val Acc: 0.8370 | Remaining: 0.3827
+2026-04-21 21:27:27,428 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8370_epoch229_remaining0.3827.pt
+2026-04-21 21:28:04,989 - INFO - Epoch 230 | Val Loss: 0.4421 | Val Acc: 0.8400 | Remaining: 0.3827
+2026-04-21 21:28:04,995 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8400_epoch230_remaining0.3827.pt
+2026-04-21 21:28:42,981 - INFO - Epoch 231 | Val Loss: 0.4418 | Val Acc: 0.8402 | Remaining: 0.3827
+2026-04-21 21:28:42,988 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8402_epoch231_remaining0.3827.pt
+2026-04-21 21:29:21,403 - INFO - Epoch 232 | Val Loss: 0.4467 | Val Acc: 0.8362 | Remaining: 0.3809
+2026-04-21 21:29:21,409 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8362_epoch232_remaining0.3809.pt
+2026-04-21 21:29:56,364 - INFO - Epoch 233 | Val Loss: 0.4446 | Val Acc: 0.8396 | Remaining: 0.3809
+2026-04-21 21:29:56,371 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch233_remaining0.3809.pt
+2026-04-21 21:30:33,222 - INFO - Epoch 234 | Val Loss: 0.4445 | Val Acc: 0.8398 | Remaining: 0.3809
+2026-04-21 21:30:33,229 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8398_epoch234_remaining0.3809.pt
+2026-04-21 21:31:11,214 - INFO - Epoch 235 | Val Loss: 0.4425 | Val Acc: 0.8371 | Remaining: 0.3809
+2026-04-21 21:31:11,221 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8371_epoch235_remaining0.3809.pt
+2026-04-21 21:31:47,706 - INFO - Epoch 236 | Val Loss: 0.4477 | Val Acc: 0.8395 | Remaining: 0.3809
+2026-04-21 21:31:47,712 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8395_epoch236_remaining0.3809.pt
+2026-04-21 21:32:26,283 - INFO - Epoch 237 | Val Loss: 0.4462 | Val Acc: 0.8387 | Remaining: 0.3809
+2026-04-21 21:32:26,290 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8387_epoch237_remaining0.3809.pt
+2026-04-21 21:33:03,231 - INFO - Epoch 238 | Val Loss: 0.4408 | Val Acc: 0.8395 | Remaining: 0.3809
+2026-04-21 21:33:03,238 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8395_epoch238_remaining0.3809.pt
+2026-04-21 21:33:41,811 - INFO - Epoch 239 | Val Loss: 0.4462 | Val Acc: 0.8389 | Remaining: 0.3773
+2026-04-21 21:33:41,878 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8389_epoch239_remaining0.3773.pt
+2026-04-21 21:34:19,509 - INFO - Epoch 240 | Val Loss: 0.4431 | Val Acc: 0.8398 | Remaining: 0.3773
+2026-04-21 21:34:19,517 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8398_epoch240_remaining0.3773.pt
+2026-04-21 21:34:58,376 - INFO - Epoch 241 | Val Loss: 0.4462 | Val Acc: 0.8386 | Remaining: 0.3773
+2026-04-21 21:34:58,538 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8386_epoch241_remaining0.3773.pt
+2026-04-21 21:35:36,055 - INFO - Epoch 242 | Val Loss: 0.4444 | Val Acc: 0.8390 | Remaining: 0.3773
+2026-04-21 21:35:36,062 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8390_epoch242_remaining0.3773.pt
+2026-04-21 21:36:16,215 - INFO - Epoch 243 | Val Loss: 0.4433 | Val Acc: 0.8435 | Remaining: 0.3773
+2026-04-21 21:36:16,222 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8435_epoch243_remaining0.3773.pt
+2026-04-21 21:36:55,694 - INFO - Epoch 244 | Val Loss: 0.4409 | Val Acc: 0.8425 | Remaining: 0.3773
+2026-04-21 21:36:55,702 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8425_epoch244_remaining0.3773.pt
+2026-04-21 21:37:33,724 - INFO - Epoch 245 | Val Loss: 0.4538 | Val Acc: 0.8397 | Remaining: 0.3736
+2026-04-21 21:37:33,730 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8397_epoch245_remaining0.3736.pt
+2026-04-21 21:38:12,190 - INFO - Epoch 246 | Val Loss: 0.4406 | Val Acc: 0.8418 | Remaining: 0.3736
+2026-04-21 21:38:12,197 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8418_epoch246_remaining0.3736.pt
+2026-04-21 21:38:50,541 - INFO - Epoch 247 | Val Loss: 0.4452 | Val Acc: 0.8393 | Remaining: 0.3736
+2026-04-21 21:38:50,546 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8393_epoch247_remaining0.3736.pt
+2026-04-21 21:39:28,078 - INFO - Epoch 248 | Val Loss: 0.4431 | Val Acc: 0.8396 | Remaining: 0.3718
+2026-04-21 21:39:28,085 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8396_epoch248_remaining0.3718.pt
+2026-04-21 21:40:06,368 - INFO - Epoch 249 | Val Loss: 0.4500 | Val Acc: 0.8337 | Remaining: 0.3718
+2026-04-21 21:40:06,374 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8337_epoch249_remaining0.3718.pt
+2026-04-21 21:40:42,793 - INFO - Epoch 250 | Val Loss: 0.4456 | Val Acc: 0.8392 | Remaining: 0.3718
+2026-04-21 21:40:42,798 - INFO - Checkpoint saved: models/20260421_185916/CKAN_acc0.8392_epoch250_remaining0.3718.pt
